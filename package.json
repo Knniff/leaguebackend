@@ -1,0 +1,23 @@
+{
+  "name": "leaguebackend",
+  "version": "1.0.0",
+  "description": "Backend for Riot-APIs. Gets data from Riot-APIs, processes it and saves it to a database for later use in a frontend webpage. Built with Express.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Knniff/leaguebackend.git"
+  },
+  "keywords": [
+    "league",
+    "backend"
+  ],
+  "author": "Knniff",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Knniff/leaguebackend/issues"
+  },
+  "homepage": "https://github.com/Knniff/leaguebackend#readme"
+}
