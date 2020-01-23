@@ -10,8 +10,8 @@ router.post("/register", register);
 router.get("/", authorize(Role.Admin), getAll); // admin only
 router.get("/:id", authorize(), getById);// all authenticated users
 router.get("/current", authorize(), getCurrent); 
-router.put("/id",authorize(), update);
-router.delete("/id",authorize(), _delete);
+router.put("/:id",authorize(Role.Admin), update);
+router.delete("/:id",authorize(Role.Admin), _delete);
 
 module.exports = router;
 
