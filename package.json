@@ -1,6 +1,10 @@
 {
   "name": "leaguebackend",
   "version": "1.0.0",
+  "type": "commonjs",
+  "engines": {
+        "node": ">=8.10.0"
+  },
   "description": "Backend for Riot-APIs. Gets data from Riot-APIs, processes it and saves it to a database for later use in a frontend webpage. Built with Express.",
   "main": "server.js",
   "scripts": {
@@ -36,11 +40,14 @@
   },
   "devDependencies": {
     "@types/jest": "^25.1.0",
+    "babel-eslint": "^10.0.3",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-security": "^1.4.0",
     "jest": "^25.1.0",
     "nodemon": "^2.0.2",
     "supertest": "^4.0.2"
