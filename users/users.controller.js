@@ -1,4 +1,11 @@
 const express = require("express");
+const {
+  loginValidationRules,
+  registerValidationRules,
+  updateValidationRules,
+  checkId,
+  validate,
+} = require("../_helpers/validator");
 const userService = require("./user.service");
 const authorize = require("../_helpers/authorize");
 const Role = require("../_helpers/role");
@@ -33,13 +40,6 @@ function getAll(req, res, next) {
     .catch(err => next(err));
 }
 
-function getCurrent(req, res, next) {
-  userService
-    .getById(req.user.sub)
-    .then(user => (user ? res.json(user) : res.sendStatus(404)))
-    .catch(err => next(err));
-}
-
 // eslint-disable-next-line consistent-return
 function getById(req, res, next) {
   const currentUser = req.user;
@@ -71,12 +71,33 @@ function deleter(req, res, next) {
 }
 
 // routes
-router.post("/authenticate", authenticate); // public routes
-router.post("/register", register);
+router.post(
+  "/authenticate",
+  loginValidationRules(),
+  validate,
+  authenticate,
+); // public routes
+router.post(
+  "/register",
+  registerValidationRules(),
+  validate,
+  register,
+);
 router.get("/", authorize(Role.Admin), getAll); // admin only
-router.get("/:id", authorize(), getById); // all authenticated users
-router.get("/current", authorize(), getCurrent);
-router.put("/:id", authorize(Role.Admin), update);
-router.delete("/:id", authorize(Role.Admin), deleter);
+router.get("/:id", checkId(), validate, authorize(), getById); // all authenticated users
+router.put(
+  "/:id",
+  updateValidationRules(),
+  validate,
+  authorize(Role.Admin),
+  update,
+);
+router.delete(
+  "/:id",
+  checkId(),
+  validate,
+  authorize(Role.Admin),
+  deleter,
+);
 
 module.exports = router;
