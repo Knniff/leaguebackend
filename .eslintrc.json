@@ -6,7 +6,11 @@
         "es6": true
     },
     "extends": [
-        "airbnb-base"
+        "airbnb-base",
+        "prettier"
+    ],
+    "plugins": [
+        "prettier"
     ],
     "globals": {
         "Atomics": "readonly",
@@ -16,6 +20,7 @@
         "ecmaVersion": 2018
     },
     "rules": {
+        "prettier/prettier": ["error"],
         "no-console": "off",
         "quotes": [
             "error",
