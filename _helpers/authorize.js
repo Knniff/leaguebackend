@@ -1,6 +1,7 @@
 const expressJwt = require("express-jwt");
 const config = require("../config");
 const ErrorHelper = require("./error-helper");
+const userService = require("../users/user.service");
 
 function authorize(roles = []) {
   // roles param can be a single role string (e.g. Role.User or 'User')
@@ -25,9 +26,17 @@ function authorize(roles = []) {
           "You dont have a role with the required Permissions for this.",
         );
       }
-
-      // authorization and authentication succesful
-      next();
+      //check if user exists and fail if it doesnt
+      userService
+        .getById(req.user.sub)
+        .then(user =>
+          user
+            ? next()
+            : next(
+                new ErrorHelper("Not Found", 404, "User deleted."),
+              ),
+        )
+        .catch(err => next(err));
     },
   ];
 }
