@@ -47,9 +47,6 @@ async function create(userParam) {
   if (userParam.password) {
     user.hash = bcrypt.hashSync(userParam.password, 10);
   }
-  console.log("hashed pw");
-  // copy userParam properties to user
-  // Object.assign(user, userParam);
 
   await user.save();
 }

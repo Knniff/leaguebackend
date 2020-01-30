@@ -31,7 +31,6 @@ function authenticate(req, res, next) {
 }
 
 function register(req, res, next) {
-  console.log(req.body);
   userService
     .create(req.body)
     .then(() => res.json({}))
@@ -50,7 +49,7 @@ function getById(req, res, next) {
   const currentUser = req.user;
   const { id } = req.params;
 
-  // only allow admins to acces other user records
+  // only allow admins to access other user records
   if (id !== currentUser.sub && currentUser.role !== Role.Admin) {
     throw new ErrorHelper(
       "Forbidden",

@@ -2,9 +2,10 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const errorHandler = require("./_helpers/error-handler");
+const log = require("./_helpers/logger");
 
 const app = express();
-
+app.use(log.expressLogger);
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
