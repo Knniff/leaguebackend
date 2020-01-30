@@ -1,5 +1,6 @@
 const expressJwt = require("express-jwt");
 const config = require("../config");
+const ErrorHelper = require("./error-helper");
 
 function authorize(roles = []) {
   // roles param can be a single role string (e.g. Role.User or 'User')
@@ -18,7 +19,11 @@ function authorize(roles = []) {
     (req, res, next) => {
       if (roles.length && !roles.includes(req.user.role)) {
         // user's role not authorized
-        return res.status(401).json({ message: "Unauthorized" });
+        throw new ErrorHelper(
+          "Unauthorized",
+          401,
+          "You dont have a role with the required Permissions for this.",
+        );
       }
 
       // authorization and authentication succesful

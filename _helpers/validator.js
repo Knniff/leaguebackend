@@ -3,13 +3,26 @@ const {
   validationResult,
   param,
 } = require("express-validator");
+const ErrorHelper = require("./error-helper");
 
 const loginValidationRules = () => {
   return [
     // username must not be empty
-    body("username").notEmpty(),
+    body("username")
+      .notEmpty()
+      .withMessage("Not Allowed to be empty.")
+      .exists()
+      .withMessage("Has to exist.")
+      .isLength({ max: 25 })
+      .withMessage("Too long, not more then 25 characters."),
     // password must not be empty
-    body("password").notEmpty(),
+    body("password")
+      .notEmpty()
+      .withMessage("Not Allowed to be empty.")
+      .exists()
+      .withMessage("Has to exist.")
+      .isLength({ max: 25 })
+      .withMessage("Too long, not more then 25 characters."),
   ];
 };
 
@@ -18,20 +31,35 @@ const registerValidationRules = () => {
     // username must not be empty
     body("username")
       .notEmpty()
-      .exists(),
+      .withMessage("Not Allowed to be empty.")
+      .exists()
+      .withMessage("Has to exist.")
+      .isLength({ max: 25 })
+      .withMessage("Too long, not more then 25 characters."),
     // password must be atleast 8 characters
     body("password")
-      .isLength({ min: 8 })
-      .withMessage("Too short, needs atleast 8 characters.")
-      .exists(),
+      .isLength({ min: 8, max: 25 })
+      .withMessage(
+        "Too short or too long, needs atleast 8 characters and not more then 25.",
+      )
+      .exists()
+      .withMessage("Has to exist."),
     // firstname must not be empty
     body("firstName")
       .notEmpty()
-      .exists(),
+      .withMessage("Not Allowed to be empty.")
+      .exists()
+      .withMessage("Has to exist.")
+      .isLength({ max: 25 })
+      .withMessage("Too long, not more then 25 characters."),
     // lastname must not be empty
     body("lastName")
       .notEmpty()
-      .exists(),
+      .withMessage("Not Allowed to be empty.")
+      .exists()
+      .withMessage("Has to exist.")
+      .isLength({ max: 25 })
+      .withMessage("Too long, not more then 25 characters."),
     // lastname must not be empty
     body("role")
       .not()
@@ -44,30 +72,46 @@ const updateValidationRules = () => {
     // username must not be empty
     body("username")
       .notEmpty()
-      .optional(),
+      .withMessage("Not Allowed to be empty. But not necessary.")
+      .optional()
+      .isLength({ max: 25 })
+      .withMessage("Too long, not more then 25 characters."),
     // password must be atleast 8 characters
     body("password")
-      .isLength({ min: 8 })
-      .withMessage("Too short, needs atleast 8 characters.")
+      .isLength({ min: 8, max: 25 })
+      .withMessage(
+        "Too short or too long, needs atleast 8 characters and not more then 25.",
+      )
       .optional(),
     // firstname must not be empty
     body("firstName")
       .notEmpty()
-      .optional(),
+      .withMessage("Not Allowed to be empty. But not necessary.")
+      .optional()
+      .isLength({ max: 25 })
+      .withMessage("Too long, not more then 25 characters."),
     // lastname must not be empty
     body("lastName")
       .notEmpty()
-      .optional(),
+      .withMessage("Not Allowed to be empty. But not necessary.")
+      .optional()
+      .isLength({ max: 25 })
+      .withMessage("Too long, not more then 25 characters."),
     // lastname must not be empty
     body("role")
       .not()
       .exists(),
-    param("id").isLength({ min: 24, max: 24 }),
+    param("id")
+      .isLength({ min: 24, max: 24 })
+      .withMessage("ID must be exactly 24 Characters long."),
   ];
 };
 
 const checkId = () => {
-  return param("id").isLength({ min: 24, max: 24 });
+  //id must be exactly 24 chars long
+  return param("id")
+    .isLength({ min: 24, max: 24 })
+    .withMessage("ID must be exactly 24 Characters long.");
 };
 
 const validate = (req, res, next) => {
@@ -80,9 +124,7 @@ const validate = (req, res, next) => {
     .array()
     .map(err => extractedErrors.push({ [err.param]: err.msg }));
 
-  return res.status(422).json({
-    errors: extractedErrors,
-  });
+  throw new ErrorHelper("Validation Error", 422, extractedErrors);
 };
 
 module.exports = {
@@ -92,10 +134,3 @@ module.exports = {
   checkId,
   validate,
 };
-
-/*
-5e 29 d4 9c 88 8b      ae 40 80 61 54 dd
-5e29fd305c29204928f0818b
-5e3016ce88d54e3d9ca774c6
-5e303828ae40010970748c88
-*/

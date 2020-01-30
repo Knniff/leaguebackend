@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const config = require("../config");
 const db = require("../_helpers/db");
+const ErrorHelper = require("../_helpers/error-helper");
 
 const { User } = db;
 
@@ -33,11 +34,12 @@ async function getById(id) {
 async function create(userParam) {
   // look if username is free
   if (await User.findOne({ username: userParam.username })) {
-    throw new Error(
-      `Username "${userParam.username}" is already taken`,
+    throw new ErrorHelper(
+      "Not Unique",
+      500,
+      `Username ${userParam.username} is already taken`,
     );
   }
-  console.log("found no duplicate");
 
   const user = new User(userParam);
   // hash password
@@ -55,11 +57,18 @@ async function create(userParam) {
 async function update(id, userParam) {
   const user = await User.findById(id);
   // validate
-  if (!user) throw new Error("User not found");
+  if (!user)
+    throw new ErrorHelper(
+      "Not Found",
+      404,
+      "Wrong ID or User deleted.",
+    );
   if (user.username !== userParam.username) {
     if (await User.findOne({ username: userParam.username })) {
-      throw new Error(
-        `Username "${userParam.username}" is already taken`,
+      throw new ErrorHelper(
+        "Not Unique",
+        500,
+        `Username ${userParam.username} is already taken`,
       );
     }
   }

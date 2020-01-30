@@ -9,6 +9,7 @@ const {
 const userService = require("./user.service");
 const authorize = require("../_helpers/authorize");
 const Role = require("../_helpers/role");
+const ErrorHelper = require("../_helpers/error-helper");
 
 const router = express.Router();
 
@@ -18,9 +19,13 @@ function authenticate(req, res, next) {
     .then(user =>
       user
         ? res.json(user)
-        : res
-            .status(400)
-            .json({ message: "Username or password is incorrect" }),
+        : next(
+            new ErrorHelper(
+              "Unauthorized",
+              401,
+              "Username or Password is incorrect.",
+            ),
+          ),
     )
     .catch(err => next(err));
 }
@@ -47,12 +52,26 @@ function getById(req, res, next) {
 
   // only allow admins to acces other user records
   if (id !== currentUser.sub && currentUser.role !== Role.Admin) {
-    return res.status(401).json({ message: "Unauthorized" });
+    throw new ErrorHelper(
+      "Forbidden",
+      403,
+      "Forbidden for standard User.",
+    );
   }
 
   userService
     .getById(req.params.id)
-    .then(user => (user ? res.json(user) : res.sendStatus(404)))
+    .then(user =>
+      user
+        ? res.json(user)
+        : next(
+            new ErrorHelper(
+              "Not Found",
+              404,
+              "Wrong ID or User deleted.",
+            ),
+          ),
+    )
     .catch(err => next(err));
 }
 

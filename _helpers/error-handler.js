@@ -1,22 +1,27 @@
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, next) {
-  if (typeof err === "string") {
-    // custom application error from string
-    return res.status(400).json({ message: err });
-  }
-
-  if (err.name === "ValidationError") {
+  /*
+  if (err.name === "CastError") {
     // mongoose validation error
-    return res.status(400).json({ message: err.message });
+    console.log("moongose: " + err.message + ",  Name: " + err.name);
+    return res.status(404).json({
+      Error: "Not Found",
+      message: "Wrong ID or User deleted.",
+    });
   }
-
-  if (err.name === "UnauthorizedError") {
-    // jwt authentication error
-    return res.status(401).json({ message: "Invalid Token" });
-  }
-
+  */
   // default error
-  return res.status(500).json({ message: err.message });
+  console.log(
+    "Default: " +
+      JSON.stringify(err.message) +
+      ",  Name: " +
+      err.name,
+  );
+  console.log("Stack:");
+  console.log(err.stack);
+  return res
+    .status(err.statusCode)
+    .json({ Error: err.name, message: err.message });
 }
 
 module.exports = errorHandler;
