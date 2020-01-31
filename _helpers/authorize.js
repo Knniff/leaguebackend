@@ -33,7 +33,11 @@ function authorize(roles = []) {
           user
             ? next()
             : next(
-                new ErrorHelper("Not Found", 404, "User deleted."),
+                new ErrorHelper(
+                  "Not Found",
+                  404,
+                  "The Token belongs to a deleted User.",
+                ),
               ),
         )
         .catch(err => next(err));

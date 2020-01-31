@@ -47,14 +47,16 @@ function getAll(req, res, next) {
 // eslint-disable-next-line consistent-return
 function getById(req, res, next) {
   const currentUser = req.user;
-  const { id } = req.params;
 
   // only allow admins to access other user records
-  if (id !== currentUser.sub && currentUser.role !== Role.Admin) {
+  if (
+    req.params.id !== currentUser.sub &&
+    currentUser.role !== Role.Admin
+  ) {
     throw new ErrorHelper(
       "Forbidden",
       403,
-      "Forbidden for standard User.",
+      "Forbidden for standard User, if its not your own account.",
     );
   }
 
@@ -75,6 +77,20 @@ function getById(req, res, next) {
 }
 
 function update(req, res, next) {
+  const currentUser = req.user;
+
+  // only allow admins to access other user records
+  if (
+    req.params.id !== currentUser.sub &&
+    currentUser.role !== Role.Admin
+  ) {
+    throw new ErrorHelper(
+      "Forbidden",
+      403,
+      "Forbidden for standard User, if its not your own account.",
+    );
+  }
+
   userService
     .update(req.params.id, req.body)
     .then(() => res.json({}))
@@ -82,6 +98,20 @@ function update(req, res, next) {
 }
 
 function deleter(req, res, next) {
+  const currentUser = req.user;
+
+  // only allow admins to delete other user records
+  if (
+    req.params.id !== currentUser.sub &&
+    currentUser.role !== Role.Admin
+  ) {
+    throw new ErrorHelper(
+      "Forbidden",
+      403,
+      "Forbidden for standard User, if its not your own account.",
+    );
+  }
+
   userService
     .delete(req.params.id)
     .then(() => res.json({}))
@@ -107,15 +137,9 @@ router.put(
   "/:id",
   updateValidationRules(),
   validate,
-  authorize(Role.Admin),
+  authorize(),
   update,
 );
-router.delete(
-  "/:id",
-  checkId(),
-  validate,
-  authorize(Role.Admin),
-  deleter,
-);
+router.delete("/:id", checkId(), validate, authorize(), deleter);
 
 module.exports = router;
