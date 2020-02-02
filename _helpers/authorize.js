@@ -1,5 +1,4 @@
 const expressJwt = require("express-jwt");
-const config = require("../config");
 const ErrorHelper = require("./error-helper");
 const userService = require("../users/user.service");
 
@@ -13,7 +12,7 @@ function authorize(roles = []) {
 
   return [
     // authenticate JWT token and attach user to request object (req.user)
-    expressJwt({ secret: config.secret }),
+    expressJwt({ secret: process.env.SECRET }),
 
     // authorize based on user role
     // eslint-disable-next-line consistent-return

@@ -38,6 +38,5 @@ typings
 .node_repl_history
 
 # Ignore config
-config.js
-
 .vscode
+.env

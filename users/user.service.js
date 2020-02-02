@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const config = require("../config");
 const db = require("../_helpers/db");
 const ErrorHelper = require("../_helpers/error-helper");
 
@@ -12,7 +11,7 @@ async function authenticate({ username, password }) {
   if (user && bcrypt.compareSync(password, user.hash)) {
     const token = jwt.sign(
       { sub: user.id, role: user.role },
-      config.secret,
+      process.env.SECRET,
       { expiresIn: "20d" },
     );
     const { hash, ...userWithoutHash } = user.toObject();

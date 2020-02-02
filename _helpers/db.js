@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
-const config = require("../config");
 const user = require("../users/user.model");
 const log = require("./logger");
 
-mongoose.set("debug", true);
+//activates debug statements for troubleshooting
+//mongoose.set("debug", true);
 mongoose
-  .connect(config.connectionString, {
+  .connect(process.env.CONNECTION_STRING, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
