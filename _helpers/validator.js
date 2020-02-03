@@ -21,8 +21,10 @@ const loginValidationRules = () => {
       .withMessage("Not Allowed to be empty.")
       .exists()
       .withMessage("Has to exist.")
-      .isLength({ max: 25 })
-      .withMessage("Too long, not more then 25 characters."),
+      .isLength({ min: 8, max: 25 })
+      .withMessage(
+        "Too short or too long, needs atleast 8 characters and not more then 25.",
+      ),
   ];
 };
 
