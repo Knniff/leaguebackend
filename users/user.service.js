@@ -42,7 +42,9 @@ async function create(userParam) {
 
   const user = new User(userParam);
   // hash password
-  user.role = "User";
+  if (!("role" in userParam)) {
+    user.role = "User";
+  }
   if (userParam.password) {
     user.hash = bcrypt.hashSync(userParam.password, 10);
   }

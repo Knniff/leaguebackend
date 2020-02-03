@@ -20,6 +20,11 @@ mongoose
   );
 mongoose.Promise = global.Promise;
 
+async function dropDB() {
+  return mongoose.connection.dropCollection("users").catch();
+}
+
 module.exports = {
   User: user,
+  dropDB,
 };
