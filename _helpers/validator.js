@@ -2,6 +2,7 @@ const {
   body,
   validationResult,
   param,
+  header,
 } = require("express-validator");
 const ErrorHelper = require("./error-helper");
 
@@ -116,6 +117,16 @@ const checkId = () => {
     .withMessage("ID must be exactly 24 Characters long.");
 };
 
+const checkToken = () => {
+  return header("authorization")
+    .notEmpty()
+    .withMessage("Not Allowed to be empty.")
+    .exists()
+    .withMessage("Has to exist.")
+    .isLength({ min: 8 })
+    .withMessage("Too short for a JWT.");
+};
+
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (errors.isEmpty()) {
@@ -134,5 +145,6 @@ module.exports = {
   registerValidationRules,
   updateValidationRules,
   checkId,
+  checkToken,
   validate,
 };
