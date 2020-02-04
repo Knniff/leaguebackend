@@ -4,6 +4,7 @@ const {
   registerValidationRules,
   updateValidationRules,
   checkId,
+  checkToken,
   validate,
 } = require("../_helpers/validator");
 const userService = require("./user.service");
@@ -131,15 +132,36 @@ router.post(
   validate,
   register,
 );
-router.get("/", authorize(Role.Admin), getAll); // admin only
-router.get("/:id", checkId(), validate, authorize(), getById); // all authenticated users
+router.get(
+  "/",
+  checkToken(),
+  validate,
+  authorize(Role.Admin),
+  getAll,
+); // admin only
+router.get(
+  "/:id",
+  checkToken(),
+  checkId(),
+  validate,
+  authorize(),
+  getById,
+); // all authenticated users
 router.put(
   "/:id",
+  checkToken(),
   updateValidationRules(),
   validate,
   authorize(),
   update,
 );
-router.delete("/:id", checkId(), validate, authorize(), deleter);
+router.delete(
+  "/:id",
+  checkToken(),
+  checkId(),
+  validate,
+  authorize(),
+  deleter,
+);
 
 module.exports = router;
