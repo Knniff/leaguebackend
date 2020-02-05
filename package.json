@@ -34,6 +34,7 @@
     "express-jwt": "^5.3.1",
     "express-pino-logger": "^4.0.0",
     "express-validator": "^6.3.1",
+    "helmet": "^3.21.2",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.1",
     "mongoose": "^5.8.9",
@@ -55,6 +56,7 @@
     "eslint-plugin-security": "^1.4.0",
     "mocha": "^7.0.1",
     "nodemon": "^2.0.2",
+    "nyc": "^15.0.0",
     "pino-pretty": "^3.5.0",
     "supertest": "^4.0.2"
   },
