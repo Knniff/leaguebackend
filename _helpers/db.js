@@ -21,7 +21,9 @@ mongoose
 mongoose.Promise = global.Promise;
 
 async function dropDB() {
-  return mongoose.connection.dropCollection("users").catch();
+  return mongoose.connection
+    .dropCollection("users")
+    .catch(err => console.log(err));
 }
 
 module.exports = {

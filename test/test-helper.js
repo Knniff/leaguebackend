@@ -19,11 +19,10 @@ beforeEach(async function() {
     role: "Admin",
   };
   await dropDB();
-  await userService.create(user).catch(console.log("already exists"));
-  await userService
-    .create(admin)
-    .catch(console.log("already exists"));
+  await userService.create(user).catch(err => console.log(err));
+  await userService.create(admin).catch(err => console.log(err));
 });
 
-// https://stackoverflow.com/questions/26453990/super-test-test-secure-rest-api
-// https://hackernoon.com/api-testing-using-supertest-1f830ce838f1
+after(async function() {
+  await dropDB();
+});

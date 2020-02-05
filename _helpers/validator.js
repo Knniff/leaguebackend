@@ -75,8 +75,9 @@ const updateValidationRules = () => {
     // username must not be empty
     body("username")
       .notEmpty()
-      .withMessage("Not Allowed to be empty. But not necessary.")
-      .optional()
+      .withMessage("Not Allowed to be empty.")
+      .exists()
+      .withMessage("Has to exist.")
       .isLength({ max: 25 })
       .withMessage("Too long, not more then 25 characters."),
     // password must be atleast 8 characters
@@ -85,19 +86,22 @@ const updateValidationRules = () => {
       .withMessage(
         "Too short or too long, needs atleast 8 characters and not more then 25.",
       )
-      .optional(),
+      .exists()
+      .withMessage("Has to exist."),
     // firstname must not be empty
     body("firstName")
       .notEmpty()
-      .withMessage("Not Allowed to be empty. But not necessary.")
-      .optional()
+      .withMessage("Not Allowed to be empty.")
+      .exists()
+      .withMessage("Has to exist.")
       .isLength({ max: 25 })
       .withMessage("Too long, not more then 25 characters."),
     // lastname must not be empty
     body("lastName")
       .notEmpty()
-      .withMessage("Not Allowed to be empty. But not necessary.")
-      .optional()
+      .withMessage("Not Allowed to be empty.")
+      .exists()
+      .withMessage("Has to exist.")
       .isLength({ max: 25 })
       .withMessage("Too long, not more then 25 characters."),
     // lastname must not be empty

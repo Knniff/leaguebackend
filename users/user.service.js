@@ -70,15 +70,11 @@ async function update(id, userParam) {
       );
     }
   }
-
-  // hash password if it was entered
-  if (userParam.password) {
-    user.hash = bcrypt.hashSync(userParam.password, 10);
-  }
+  // hash password
+  user.hash = bcrypt.hashSync(userParam.password, 10);
 
   // copy userParam properties to user
   Object.assign(user, userParam);
-
   await user.save();
 }
 
