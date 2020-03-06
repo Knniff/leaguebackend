@@ -182,13 +182,6 @@ describe("PUT /users/", function() {
               username: "Has to exist.",
             },
             {
-              password:
-                "Too short or too long, needs atleast 8 characters and not more then 25.",
-            },
-            {
-              password: "Has to exist.",
-            },
-            {
               firstName: "Not Allowed to be empty.",
             },
             {

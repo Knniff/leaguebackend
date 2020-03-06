@@ -86,8 +86,7 @@ const updateValidationRules = () => {
       .withMessage(
         "Too short or too long, needs atleast 8 characters and not more then 25.",
       )
-      .exists()
-      .withMessage("Has to exist."),
+      .optional(),
     // firstname must not be empty
     body("firstName")
       .notEmpty()
