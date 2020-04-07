@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use("/users", require("./users/users.controller"));
+app.use("/league", require("./league/league.controller"));
 
 app.use(errorHandler);
 

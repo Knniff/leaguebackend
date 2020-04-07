@@ -1,0 +1,226 @@
+const apiService = require("./api.service");
+const ErrorHelper = require("../_helpers/error-helper");
+const db = require("../_helpers/db");
+
+const { Mastery, Summoner } = db;
+//https://engineering.mixmax.com/blog/api-paging-built-the-right-way/
+// all mastery with pagination
+async function mastery(next, limit) {
+  if (limit > 50) {
+    throw new ErrorHelper(
+      "Internal Server Error",
+      500,
+      "Limit max is 50.",
+    );
+  }
+  if (!limit) {
+    limit = 20;
+  }
+  if (limit) {
+    limit = parseInt(limit, 10);
+  }
+  var data = [];
+
+  if (next === undefined) {
+    data = await Mastery.find({})
+      .sort({ championPoints: -1, _id: -1 })
+      .limit(limit);
+  } else {
+    if (!next.includes("_")) {
+      return;
+    }
+    const [nextChampionPoints, nextId] = next.split("_");
+    if (nextId.length !== 24) {
+      throw new ErrorHelper(
+        "Internal Server Error",
+        500,
+        "Id in next key is malformed.",
+      );
+    }
+    data = await Mastery.find({
+      $or: [
+        { championPoints: { $lt: nextChampionPoints } },
+        { championPoints: nextChampionPoints, _id: { $lt: nextId } },
+      ],
+    })
+      .sort({ championPoints: -1, _id: -1 })
+      .limit(limit);
+  }
+  if (data.length) {
+    const last = data[data.length - 1];
+    const nextMastery = `${last.championPoints}_${last._id}`;
+    const res = { mastery: data, next: nextMastery };
+    return res;
+  } else {
+    return;
+  }
+}
+
+// all mastery from one champion with pagination
+async function championMastery(next, limit, championId) {
+  if (limit > 50) {
+    throw new ErrorHelper(
+      "Internal Server Error",
+      500,
+      "Limit max is 50.",
+    );
+  }
+  if (!limit) {
+    limit = 20;
+  }
+  if (limit) {
+    limit = parseInt(limit, 10);
+  }
+  var data = [];
+
+  if (next === undefined) {
+    data = await Mastery.find({ championId: championId })
+      .sort({ championPoints: -1, _id: -1 })
+      .limit(limit);
+    console.log(data);
+  } else {
+    if (!next.includes("_")) {
+      return;
+    }
+    const [nextChampionPoints, nextId] = next.split("_");
+    if (nextId.length !== 24) {
+      throw new ErrorHelper(
+        "Internal Server Error",
+        500,
+        "Id in next key is malformed.",
+      );
+    }
+    data = await Mastery.find({
+      championId: championId,
+      $or: [
+        { championPoints: { $lt: nextChampionPoints } },
+        { championPoints: nextChampionPoints, _id: { $lt: nextId } },
+      ],
+    })
+      .sort({ championPoints: -1, _id: -1 })
+      .limit(limit);
+  }
+  if (data.length) {
+    const last = data[data.length - 1];
+    const nextMastery = `${last.championPoints}_${last._id}`;
+    const res = { mastery: data, next: nextMastery };
+    return res;
+  } else {
+    return;
+  }
+}
+
+// all mastery from one Summoner
+async function summonerMastery(summonerId) {
+  return Mastery.find({ summonerId: summonerId });
+}
+
+// add summoner and mastery or update summoner
+async function summoner(summonerId) {
+  const oldSummoner = await Summoner.findOne({
+    summonerId: summonerId,
+  });
+  if (oldSummoner) {
+    const data = await apiService
+      .summonerById(summonerId)
+      .catch((err) => {
+        throw err;
+      });
+    if (data.status) {
+      throw new ErrorHelper(
+        "Internal Server Error",
+        data.status.status_code,
+        "Riot-API failure or wrong API-key.",
+      );
+    }
+    oldSummoner.summonerName = data.name;
+    oldSummoner.summonerLevel = data.summonerLevel;
+    oldSummoner.iconId = data.profileIconId;
+    oldSummoner.save();
+    return oldSummoner;
+  } else {
+    const data = await apiService
+      .summonerById(summonerId)
+      .catch((err) => {
+        throw err;
+      });
+    if (data.status) {
+      throw new ErrorHelper(
+        "Internal Server Error",
+        data.status.status_code,
+        "Riot-API failure or wrong API-key.",
+      );
+    }
+    const summoner = new Summoner();
+    summoner.summonerId = data.id;
+    summoner.accountId = data.accountId;
+    summoner.puuid = data.puuid;
+    summoner.summonerName = data.name;
+    summoner.summonerLevel = data.summonerLevel;
+    summoner.iconId = data.profileIconId;
+    summoner.serverId = "EUW";
+    summoner.save();
+    const masteryData = await apiService
+      .mastery(summonerId)
+      .catch((err) => {
+        throw err;
+      });
+    Mastery.insertMany(masteryData);
+    return summoner;
+  }
+}
+
+// update masteries from one Summoner
+async function updateMastery(summonerId) {
+  var temp = [];
+  const masteryData = await apiService
+    .mastery(summonerId)
+    .catch((err) => {
+      throw err;
+    });
+
+  var oldMasteryData = await Mastery.find({ summonerId: summonerId });
+  for (let index = 0; index < masteryData.length; index++) {
+    let masteryIndex = oldMasteryData.findIndex(
+      (x) => x.championId === masteryData[index].championId,
+    );
+    try {
+      masteryData[index]._id = oldMasteryData[masteryIndex]._id;
+    } catch (error) {
+      temp.push(index);
+
+      const mastery = new Mastery(masteryData[index]);
+      mastery.save();
+    }
+  }
+
+  if (temp) {
+    for (let index = temp.length - 1; index >= 0; index--) {
+      masteryData.splice(temp[index], 1);
+      console.log("spliced " + temp[index]);
+    }
+  }
+
+  const bulkOps = masteryData.map((masteryData) => ({
+    updateOne: {
+      filter: { _id: masteryData._id },
+      update: masteryData,
+      upsert: true,
+    },
+  }));
+
+  Mastery.bulkWrite(bulkOps)
+    .then((bulkWriteOpResult) => {
+      return bulkWriteOpResult;
+    })
+    .catch((err) => {
+      throw new ErrorHelper("Internal Server Error", 500, err);
+    });
+}
+module.exports = {
+  summonerMastery,
+  championMastery,
+  updateMastery,
+  summoner,
+  mastery,
+};
