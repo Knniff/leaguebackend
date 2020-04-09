@@ -83,6 +83,13 @@ function updateSummonerMastery(req, res, next) {
     .then((data) => res.json(data))
     .catch((err) => next(err));
 }
+
+function masteryStats(req, res, next) {
+  leagueService
+    .masteryStats(req.params.id)
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
+}
 // match
 /*
 function match(req, res, next) {
@@ -173,6 +180,14 @@ router.get(
   validate,
   authorize(),
   updateSummonerMastery,
+);
+
+router.get(
+  "/mastery/stats/:id",
+  checkToken(),
+  validate,
+  authorize(),
+  masteryStats,
 );
 
 /*

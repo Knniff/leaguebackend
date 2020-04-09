@@ -217,10 +217,63 @@ async function updateMastery(summonerId) {
       throw new ErrorHelper("Internal Server Error", 500, err);
     });
 }
+
+async function masteryStats(id) {
+  var stats = {
+    type: "All",
+    totalMasteries: 0,
+    combinedLevel: 0,
+    combinedChampionPoints: 0,
+    combinedChestsGranted: 0,
+  };
+
+  if (id.length === 47) {
+    var masteryData = await Mastery.find({ summonerId: id });
+    stats.type = id;
+    masteryData.forEach((element) => {
+      stats.totalMasteries = stats.totalMasteries + 1;
+      stats.combinedLevel =
+        stats.combinedLevel + element.championLevel;
+      stats.combinedChampionPoints =
+        stats.combinedChampionPoints + element.championPoints;
+      if (element.chestGranted) {
+        stats.combinedChestsGranted = stats.combinedChestsGranted + 1;
+      }
+    });
+  } else if (id === "all") {
+    var masteryData = await Mastery.find();
+    masteryData.forEach((element) => {
+      stats.totalMasteries = stats.totalMasteries + 1;
+      stats.combinedLevel =
+        stats.combinedLevel + element.championLevel;
+      stats.combinedChampionPoints =
+        stats.combinedChampionPoints + element.championPoints;
+      if (element.chestGranted) {
+        stats.combinedChestsGranted = stats.combinedChestsGranted + 1;
+      }
+    });
+  } else {
+    var masteryData = await Mastery.find({ championId: id });
+    stats.type = id;
+    masteryData.forEach((element) => {
+      stats.totalMasteries = stats.totalMasteries + 1;
+      stats.combinedLevel =
+        stats.combinedLevel + element.championLevel;
+      stats.combinedChampionPoints =
+        stats.combinedChampionPoints + element.championPoints;
+      if (element.chestGranted) {
+        stats.combinedChestsGranted = stats.combinedChestsGranted + 1;
+      }
+    });
+  }
+  return stats;
+}
+
 module.exports = {
   summonerMastery,
   championMastery,
   updateMastery,
+  masteryStats,
   summoner,
   mastery,
 };
