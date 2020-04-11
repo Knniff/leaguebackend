@@ -1,0 +1,1964 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+      "title": "League of Legends Backend",
+      "version": "1.0",
+      "license": {
+        "name": "MIT",
+        "url": "https://github.com/Knniff/leaguebackend/blob/master/LICENSE.txt"
+      },
+      "description": "A simple api for getting league mastery stats and summoner data. A nodejs server with a mongodb in the background."
+    },
+    "servers": [
+      {
+        "url": "localhost:4000"
+      }
+    ],
+    "tags": [
+      {
+        "name": "users",
+        "description": "Create, Update and Login"
+      },
+      {
+        "name": "league",
+        "description": "All your league stats"
+      }
+    ],
+    "paths": {
+      "/users/register": {
+        "post": {
+          "description": "Creates a new user.",
+          "tags": [
+            "users"
+          ],
+          "operationId": "newUser",
+          "requestBody": {
+            "description": "The User to add/register.",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "required": [
+                        "username",
+                        "password"
+                      ],
+                      "properties": {
+                        "username": {
+                          "type": "string"
+                        },
+                        "password": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ],
+                  "required": [
+                    "firstName",
+                    "lastName"
+                  ],
+                  "properties": {
+                    "firstName": {
+                      "type": "string"
+                    },
+                    "lastName": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Created new user.",
+              "content": {
+                "application/json": {
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/users/authenticate": {
+        "post": {
+          "description": "Login with password and username and get JWT-Token back.",
+          "operationId": "loginUser",
+          "tags": [
+            "users"
+          ],
+          "requestBody": {
+            "description": "The Userdata to login.",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "required": [
+                    "username",
+                    "password"
+                  ],
+                  "properties": {
+                    "username": {
+                      "type": "string"
+                    },
+                    "password": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Logged in user.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "username",
+                      "firstName",
+                      "lastName",
+                      "_id",
+                      "createdDate",
+                      "role",
+                      "__v",
+                      "token"
+                    ],
+                    "properties": {
+                      "firstName": {
+                        "type": "string"
+                      },
+                      "lastName": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      },
+                      "_id": {
+                        "type": "string"
+                      },
+                      "token": {
+                        "type": "string"
+                      },
+                      "createdDate": {
+                        "type": "string"
+                      },
+                      "role": {
+                        "type": "string"
+                      },
+                      "__v": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/users/{userId}": {
+        "get": {
+          "security": [
+            {
+              "bearerAuth": [
+  
+              ]
+            }
+          ],
+          "description": "Get one User with the id.",
+          "tags": [
+            "users"
+          ],
+          "operationId": "getOneUser",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "userId",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Returns user with specified id when the Bearertoken allows it.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "username",
+                      "firstName",
+                      "lastName",
+                      "_id",
+                      "createdDate",
+                      "role",
+                      "__v",
+                      "token"
+                    ],
+                    "properties": {
+                      "firstName": {
+                        "type": "string"
+                      },
+                      "lastName": {
+                        "type": "string"
+                      },
+                      "username": {
+                        "type": "string"
+                      },
+                      "_id": {
+                        "type": "string"
+                      },
+                      "token": {
+                        "type": "string"
+                      },
+                      "createdDate": {
+                        "type": "string"
+                      },
+                      "role": {
+                        "type": "string"
+                      },
+                      "__v": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "403": {
+              "description": "Forbidden, only admins can get all users.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "put": {
+          "security": [
+            {
+              "bearerAuth": [
+  
+              ]
+            }
+          ],
+          "description": "Update User with id.",
+          "tags": [
+            "users"
+          ],
+          "operationId": "updateUser",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "userId",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Updates user when the Bearertoken allows it.",
+              "content": {
+                "application/json": {
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized Only Admins can edit others.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/users": {
+        "get": {
+          "security": [
+            {
+              "bearerAuth": [
+  
+              ]
+            }
+          ],
+          "description": "Gets all Users when admin.",
+          "tags": [
+            "users"
+          ],
+          "operationId": "getAllUser",
+          "responses": {
+            "200": {
+              "description": "Returns all users when the Bearertoken allows it.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "users"
+                    ],
+                    "properties": {
+                      "users": {
+                        "type": "array",
+                        "items": {
+                          "required": [
+                            "username",
+                            "firstName",
+                            "lastName",
+                            "_id",
+                            "createdDate",
+                            "role",
+                            "__v",
+                            "token"
+                          ],
+                          "properties": {
+                            "firstName": {
+                              "type": "string"
+                            },
+                            "lastName": {
+                              "type": "string"
+                            },
+                            "username": {
+                              "type": "string"
+                            },
+                            "_id": {
+                              "type": "string"
+                            },
+                            "token": {
+                              "type": "string"
+                            },
+                            "createdDate": {
+                              "type": "string"
+                            },
+                            "role": {
+                              "type": "string"
+                            },
+                            "__v": {
+                              "type": "integer"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized Only Admins can get all.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/league/summoner/name/{summonerName}": {
+        "get": {
+          "security": [
+            {
+              "bearerAuth": [
+  
+              ]
+            }
+          ],
+          "description": "Get the summoner info for a specific name.",
+          "tags": [
+            "league"
+          ],
+          "operationId": "summonerName",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "summonerName",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "The requested summoner directly from the Riot-API.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "id",
+                      "accountId",
+                      "puuid",
+                      "name",
+                      "profileIconId",
+                      "revisionDate",
+                      "summonerLevel"
+                    ],
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "accountId": {
+                        "type": "string"
+                      },
+                      "puuid": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "profileIconId": {
+                        "type": "integer"
+                      },
+                      "revisionDate": {
+                        "type": "integer"
+                      },
+                      "summonerLevel": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/league/summoner/id/{summonerId}": {
+        "get": {
+          "security": [
+            {
+              "bearerAuth": [
+  
+              ]
+            }
+          ],
+          "description": "Get the summoner info for a specific id from the database, when the id is seen for the first time a summoner is added to the DB and the masteries are fetched.",
+          "tags": [
+            "league"
+          ],
+          "operationId": "summonerId",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "summonerId",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "The updated summoner from the DB.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "_id",
+                      "id",
+                      "summonerId",
+                      "accountId",
+                      "puuid",
+                      "summonerName",
+                      "summonerLevel",
+                      "iconId",
+                      "serverId",
+                      "createdAt",
+                      "updatedAt",
+                      "__v"
+                    ],
+                    "properties": {
+                      "_id": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "summonerId": {
+                        "type": "string"
+                      },
+                      "accountId": {
+                        "type": "string"
+                      },
+                      "puuid": {
+                        "type": "string"
+                      },
+                      "summonerName": {
+                        "type": "string"
+                      },
+                      "summonerLevel": {
+                        "type": "integer"
+                      },
+                      "iconId": {
+                        "type": "integer"
+                      },
+                      "serverId": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": "string"
+                      },
+                      "__v": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/league/mastery": {
+        "get": {
+          "security": [
+            {
+              "bearerAuth": [
+  
+              ]
+            }
+          ],
+          "description": "Get masteries.",
+          "tags": [
+            "league"
+          ],
+          "operationId": "masteryAll",
+          "parameters": [
+            {
+              "in": "query",
+              "name": "limit",
+              "schema": {
+                "type": "integer",
+                "maximum": 50,
+                "minimum": 1
+              }
+            },
+            {
+              "in": "query",
+              "name": "next",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "The masteries in an Array.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "mastery",
+                      "next"
+                    ],
+                    "properties": {
+                      "mastery": {
+                        "type": "array",
+                        "items": {
+                          "required": [
+                            "mastery"
+                          ],
+                          "properties": {
+                            "mastery": {
+                              "type": "object",
+                              "properties": {
+                                "_id": {
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "type": "string"
+                                },
+                                "championId": {
+                                  "type": "integer"
+                                },
+                                "championLevel": {
+                                  "type": "integer"
+                                },
+                                "championPoints": {
+                                  "type": "integer"
+                                },
+                                "lastPlayTime": {
+                                  "type": "integer"
+                                },
+                                "championPointsSinceLastLevel": {
+                                  "type": "integer"
+                                },
+                                "championPointsUntilNextLevel": {
+                                  "type": "integer"
+                                },
+                                "chestGranted": {
+                                  "type": "boolean"
+                                },
+                                "tokensEarned": {
+                                  "type": "integer"
+                                },
+                                "summonerId": {
+                                  "type": "string"
+                                },
+                                "__v": {
+                                  "type": "integer"
+                                },
+                                "createdAt": {
+                                  "type": "string"
+                                },
+                                "updatedAt": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "next": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/league/mastery/summoner/{summonerId}": {
+        "get": {
+          "security": [
+            {
+              "bearerAuth": [
+  
+              ]
+            }
+          ],
+          "description": "Get all masteries from the specified summoner.",
+          "tags": [
+            "league"
+          ],
+          "operationId": "masteryAllSummoner",
+          "parameters": [
+            {
+              "in": "query",
+              "name": "limit",
+              "schema": {
+                "type": "integer",
+                "maximum": 50,
+                "minimum": 1
+              }
+            },
+            {
+              "in": "query",
+              "name": "next",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "in": "path",
+              "name": "summonerId",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "The masteries in an Array.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "mastery",
+                      "next"
+                    ],
+                    "properties": {
+                      "mastery": {
+                        "type": "array",
+                        "items": {
+                          "required": [
+                            "mastery"
+                          ],
+                          "properties": {
+                            "mastery": {
+                              "type": "object",
+                              "properties": {
+                                "_id": {
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "type": "string"
+                                },
+                                "championId": {
+                                  "type": "integer"
+                                },
+                                "championLevel": {
+                                  "type": "integer"
+                                },
+                                "championPoints": {
+                                  "type": "integer"
+                                },
+                                "lastPlayTime": {
+                                  "type": "integer"
+                                },
+                                "championPointsSinceLastLevel": {
+                                  "type": "integer"
+                                },
+                                "championPointsUntilNextLevel": {
+                                  "type": "integer"
+                                },
+                                "chestGranted": {
+                                  "type": "boolean"
+                                },
+                                "tokensEarned": {
+                                  "type": "integer"
+                                },
+                                "summonerId": {
+                                  "type": "string"
+                                },
+                                "__v": {
+                                  "type": "integer"
+                                },
+                                "createdAt": {
+                                  "type": "string"
+                                },
+                                "updatedAt": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "next": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/league/mastery/champion/{championId}": {
+        "get": {
+          "security": [
+            {
+              "bearerAuth": [
+  
+              ]
+            }
+          ],
+          "description": "Get all masteries from the specified summoner.",
+          "tags": [
+            "league"
+          ],
+          "operationId": "masteryAllChampion",
+          "parameters": [
+            {
+              "in": "query",
+              "name": "limit",
+              "schema": {
+                "type": "integer",
+                "maximum": 50,
+                "minimum": 1
+              }
+            },
+            {
+              "in": "query",
+              "name": "next",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "in": "path",
+              "name": "championId",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "The masteries in an Array.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "mastery",
+                      "next"
+                    ],
+                    "properties": {
+                      "mastery": {
+                        "type": "array",
+                        "items": {
+                          "required": [
+                            "mastery"
+                          ],
+                          "properties": {
+                            "mastery": {
+                              "type": "object",
+                              "properties": {
+                                "_id": {
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "type": "string"
+                                },
+                                "championId": {
+                                  "type": "integer"
+                                },
+                                "championLevel": {
+                                  "type": "integer"
+                                },
+                                "championPoints": {
+                                  "type": "integer"
+                                },
+                                "lastPlayTime": {
+                                  "type": "integer"
+                                },
+                                "championPointsSinceLastLevel": {
+                                  "type": "integer"
+                                },
+                                "championPointsUntilNextLevel": {
+                                  "type": "integer"
+                                },
+                                "chestGranted": {
+                                  "type": "boolean"
+                                },
+                                "tokensEarned": {
+                                  "type": "integer"
+                                },
+                                "summonerId": {
+                                  "type": "string"
+                                },
+                                "__v": {
+                                  "type": "integer"
+                                },
+                                "createdAt": {
+                                  "type": "string"
+                                },
+                                "updatedAt": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "next": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/league/update/{summonerId}": {
+        "put": {
+          "security": [
+            {
+              "bearerAuth": [
+  
+              ]
+            }
+          ],
+          "description": "Update the masteries for the specified summoner.",
+          "tags": [
+            "league"
+          ],
+          "operationId": "updateMastery",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "summonerId",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Empty",
+              "content": {
+                "application/json": {
+                  "schema": {
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/league/mastery/stats/{id}": {
+        "get": {
+          "security": [
+            {
+              "bearerAuth": [
+  
+              ]
+            }
+          ],
+          "description": "Get the stats for either a champion, summoner or everthing. If you want the stats for everthing use the keyword \"all\".",
+          "tags": [
+            "league"
+          ],
+          "operationId": "getStats",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "The stats in an object.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "type",
+                      "totalMasteries",
+                      "combinedLevel",
+                      "combinedChampionPoints",
+                      "combinedChestsGranted"
+                    ],
+                    "properties": {
+                      "type": {
+                        "type": "string"
+                      },
+                      "totalMasteries": {
+                        "type": "integer"
+                      },
+                      "combinedLevel": {
+                        "type": "integer"
+                      },
+                      "combinedChampionPoints": {
+                        "type": "integer"
+                      },
+                      "combinedChestsGranted": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Wrong input.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "required": [
+                      "Error",
+                      "message"
+                    ],
+                    "properties": {
+                      "Error": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "array"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      },
+      "schemas": {
+        "Stats": {
+          "required": [
+            "type",
+            "totalMasteries",
+            "combinedLevel",
+            "combinedChampionPoints",
+            "combinedChestsGranted"
+          ],
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "totalMasteries": {
+              "type": "integer"
+            },
+            "combinedLevel": {
+              "type": "integer"
+            },
+            "combinedChampionPoints": {
+              "type": "integer"
+            },
+            "combinedChestsGranted": {
+              "type": "integer"
+            }
+          }
+        },
+        "DirectSummoner": {
+          "required": [
+            "id",
+            "accountId",
+            "puuid",
+            "name",
+            "profileIconId",
+            "revisionDate",
+            "summonerLevel"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "accountId": {
+              "type": "string"
+            },
+            "puuid": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "profileIconId": {
+              "type": "integer"
+            },
+            "revisionDate": {
+              "type": "integer"
+            },
+            "summonerLevel": {
+              "type": "integer"
+            }
+          }
+        },
+        "Summoner": {
+          "required": [
+            "_id",
+            "id",
+            "summonerId",
+            "accountId",
+            "puuid",
+            "summonerName",
+            "summonerLevel",
+            "iconId",
+            "serverId",
+            "createdAt",
+            "updatedAt",
+            "__v"
+          ],
+          "properties": {
+            "_id": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "summonerId": {
+              "type": "string"
+            },
+            "accountId": {
+              "type": "string"
+            },
+            "puuid": {
+              "type": "string"
+            },
+            "summonerName": {
+              "type": "string"
+            },
+            "summonerLevel": {
+              "type": "integer"
+            },
+            "iconId": {
+              "type": "integer"
+            },
+            "serverId": {
+              "type": "string"
+            },
+            "createdAt": {
+              "type": "string"
+            },
+            "updatedAt": {
+              "type": "string"
+            },
+            "__v": {
+              "type": "integer"
+            }
+          }
+        },
+        "Mastery": {
+          "required": [
+            "mastery",
+            "next"
+          ],
+          "properties": {
+            "mastery": {
+              "type": "array",
+              "items": {
+                "required": [
+                  "mastery"
+                ],
+                "properties": {
+                  "mastery": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "championId": {
+                        "type": "integer"
+                      },
+                      "championLevel": {
+                        "type": "integer"
+                      },
+                      "championPoints": {
+                        "type": "integer"
+                      },
+                      "lastPlayTime": {
+                        "type": "integer"
+                      },
+                      "championPointsSinceLastLevel": {
+                        "type": "integer"
+                      },
+                      "championPointsUntilNextLevel": {
+                        "type": "integer"
+                      },
+                      "chestGranted": {
+                        "type": "boolean"
+                      },
+                      "tokensEarned": {
+                        "type": "integer"
+                      },
+                      "summonerId": {
+                        "type": "string"
+                      },
+                      "__v": {
+                        "type": "integer"
+                      },
+                      "createdAt": {
+                        "type": "string"
+                      },
+                      "updatedAt": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "next": {
+              "type": "string"
+            }
+          }
+        },
+        "OneMastery": {
+          "required": [
+            "mastery"
+          ],
+          "properties": {
+            "mastery": {
+              "type": "object",
+              "properties": {
+                "_id": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "championId": {
+                  "type": "integer"
+                },
+                "championLevel": {
+                  "type": "integer"
+                },
+                "championPoints": {
+                  "type": "integer"
+                },
+                "lastPlayTime": {
+                  "type": "integer"
+                },
+                "championPointsSinceLastLevel": {
+                  "type": "integer"
+                },
+                "championPointsUntilNextLevel": {
+                  "type": "integer"
+                },
+                "chestGranted": {
+                  "type": "boolean"
+                },
+                "tokensEarned": {
+                  "type": "integer"
+                },
+                "summonerId": {
+                  "type": "string"
+                },
+                "__v": {
+                  "type": "integer"
+                },
+                "createdAt": {
+                  "type": "string"
+                },
+                "updatedAt": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "Login": {
+          "required": [
+            "username",
+            "password"
+          ],
+          "properties": {
+            "username": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
+            }
+          }
+        },
+        "User": {
+          "allOf": [
+            {
+              "required": [
+                "username",
+                "password"
+              ],
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          ],
+          "required": [
+            "firstName",
+            "lastName"
+          ],
+          "properties": {
+            "firstName": {
+              "type": "string"
+            },
+            "lastName": {
+              "type": "string"
+            }
+          }
+        },
+        "UserResponse": {
+          "required": [
+            "username",
+            "firstName",
+            "lastName",
+            "_id",
+            "createdDate",
+            "role",
+            "__v",
+            "token"
+          ],
+          "properties": {
+            "firstName": {
+              "type": "string"
+            },
+            "lastName": {
+              "type": "string"
+            },
+            "username": {
+              "type": "string"
+            },
+            "_id": {
+              "type": "string"
+            },
+            "token": {
+              "type": "string"
+            },
+            "createdDate": {
+              "type": "string"
+            },
+            "role": {
+              "type": "string"
+            },
+            "__v": {
+              "type": "integer"
+            }
+          }
+        },
+        "Users": {
+          "required": [
+            "users"
+          ],
+          "properties": {
+            "users": {
+              "type": "array",
+              "items": {
+                "required": [
+                  "username",
+                  "firstName",
+                  "lastName",
+                  "_id",
+                  "createdDate",
+                  "role",
+                  "__v",
+                  "token"
+                ],
+                "properties": {
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "_id": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string"
+                  },
+                  "createdDate": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string"
+                  },
+                  "__v": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "Error": {
+          "required": [
+            "Error",
+            "message"
+          ],
+          "properties": {
+            "Error": {
+              "type": "string"
+            },
+            "message": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }

@@ -58,13 +58,14 @@ async function mastery(next, limit) {
 
 // all mastery from one champion with pagination
 async function championMastery(next, limit, championId) {
-  if (limit > 50) {
+  if (limit > 50 || limit < 1) {
     throw new ErrorHelper(
       "Internal Server Error",
       500,
-      "Limit max is 50.",
+      "Limit max is 50 and min 1.",
     );
   }
+
   if (!limit) {
     limit = 20;
   }
@@ -111,8 +112,59 @@ async function championMastery(next, limit, championId) {
 }
 
 // all mastery from one Summoner
-async function summonerMastery(summonerId) {
-  return Mastery.find({ summonerId: summonerId });
+async function summonerMastery(next, limit, summonerId) {
+  if (limit > 50 || limit < 1) {
+    throw new ErrorHelper(
+      "Internal Server Error",
+      500,
+      "Limit max is 50 and min 1.",
+    );
+  }
+
+  if (!limit) {
+    limit = 20;
+  }
+  if (limit) {
+    limit = parseInt(limit, 10);
+  }
+  var data = [];
+
+  if (next === undefined) {
+    data = await Mastery.find({ summonerId: summonerId })
+      .sort({ championPoints: -1, _id: -1 })
+      .limit(limit);
+    console.log(data);
+  } else {
+    if (!next.includes("_")) {
+      return;
+    }
+    const [nextChampionPoints, nextId] = next.split("_");
+    if (nextId.length !== 24) {
+      throw new ErrorHelper(
+        "Internal Server Error",
+        500,
+        "Id in next key is malformed.",
+      );
+    }
+    data = await Mastery.find({
+      summonerId: summonerId,
+      $or: [
+        { championPoints: { $lt: nextChampionPoints } },
+        { championPoints: nextChampionPoints, _id: { $lt: nextId } },
+      ],
+    })
+      .sort({ championPoints: -1, _id: -1 })
+      .limit(limit);
+  }
+  if (data.length) {
+    const last = data[data.length - 1];
+    const nextMastery = `${last.championPoints}_${last._id}`;
+    const res = { mastery: data, next: nextMastery };
+    return res;
+  } else {
+    return;
+  }
+  //return Mastery.find({ summonerId: summonerId });
 }
 
 // add summoner and mastery or update summoner

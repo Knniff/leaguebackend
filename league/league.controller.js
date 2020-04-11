@@ -63,7 +63,7 @@ function championMastery(req, res, next) {
 
 function summonerMastery(req, res, next) {
   leagueService
-    .summonerMastery(req.params.id)
+    .summonerMastery(req.query.next, req.query.limit, req.params.id)
     .then((data) =>
       data
         ? res.json(data)
@@ -174,7 +174,7 @@ router.get(
   championMastery,
 );
 
-router.get(
+router.put(
   "/mastery/update/:id",
   checkToken(),
   validate,
