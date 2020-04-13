@@ -1,8 +1,11 @@
-const apiService = require("./api.service");
+// apiService uses a package to call the official riot api
+const apiService = require("../_helpers/api.service");
 const ErrorHelper = require("../_helpers/error-helper");
+//instatiating the database: look at the database file for more info
 const db = require("../_helpers/db");
-
+// loads the Mastery and Summoner Model
 const { Mastery, Summoner } = db;
+
 //https://engineering.mixmax.com/blog/api-paging-built-the-right-way/
 // all mastery with pagination
 async function mastery(next, limit) {
@@ -78,7 +81,6 @@ async function championMastery(next, limit, championId) {
     data = await Mastery.find({ championId: championId })
       .sort({ championPoints: -1, _id: -1 })
       .limit(limit);
-    console.log(data);
   } else {
     if (!next.includes("_")) {
       return;
@@ -133,7 +135,6 @@ async function summonerMastery(next, limit, summonerId) {
     data = await Mastery.find({ summonerId: summonerId })
       .sort({ championPoints: -1, _id: -1 })
       .limit(limit);
-    console.log(data);
   } else {
     if (!next.includes("_")) {
       return;
@@ -164,7 +165,6 @@ async function summonerMastery(next, limit, summonerId) {
   } else {
     return;
   }
-  //return Mastery.find({ summonerId: summonerId });
 }
 
 // add summoner and mastery or update summoner
@@ -249,7 +249,6 @@ async function updateMastery(summonerId) {
   if (temp) {
     for (let index = temp.length - 1; index >= 0; index--) {
       masteryData.splice(temp[index], 1);
-      console.log("spliced " + temp[index]);
     }
   }
 

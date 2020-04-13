@@ -1,17 +1,15 @@
 const express = require("express");
 const { checkToken, validate } = require("../_helpers/validator");
-const leagueService = require("./league.service");
-const apiService = require("./api.service");
+const masteryService = require("./mastery.service");
+const apiService = require("../_helpers/api.service");
 const authorize = require("../_helpers/authorize");
-const Role = require("../_helpers/role");
 const ErrorHelper = require("../_helpers/error-helper");
 
 const router = express.Router();
 
-//Summoner
 //find a Summoner by Id. then either update his data and mastery or add
 function summonerById(req, res, next) {
-  leagueService
+  masteryService
     .summoner(req.params.id)
     .then((data) => res.json(data))
     .catch((err) => next(err));
@@ -26,9 +24,9 @@ function summonerByName(req, res, next) {
 }
 
 //Mastery
-//
+//get all mastery with built in pagination
 function mastery(req, res, next) {
-  leagueService
+  masteryService
     .mastery(req.query.next, req.query.limit)
     .then((data) =>
       data
@@ -44,8 +42,9 @@ function mastery(req, res, next) {
     .catch((err) => next(err));
 }
 
+//get all mastery from a specific champion with built in pagination
 function championMastery(req, res, next) {
-  leagueService
+  masteryService
     .championMastery(req.query.next, req.query.limit, req.params.id)
     .then((data) =>
       data
@@ -61,8 +60,9 @@ function championMastery(req, res, next) {
     .catch((err) => next(err));
 }
 
+//get all mastery from a specific summoner with built in pagination
 function summonerMastery(req, res, next) {
-  leagueService
+  masteryService
     .summonerMastery(req.query.next, req.query.limit, req.params.id)
     .then((data) =>
       data
@@ -77,25 +77,27 @@ function summonerMastery(req, res, next) {
     );
 }
 
+//update the masteries from a specific summoner
 function updateSummonerMastery(req, res, next) {
-  leagueService
+  masteryService
     .updateMastery(req.params.id)
     .then((data) => res.json(data))
     .catch((err) => next(err));
 }
 
+//get stats about all/champion/summoner masteries
 function masteryStats(req, res, next) {
-  leagueService
+  masteryService
     .masteryStats(req.params.id)
     .then((data) => res.json(data))
     .catch((err) => next(err));
 }
 // match
-/*
+//currently no real backend just putting data through from the riot api
 function match(req, res, next) {
   apiService
     .match(req.params.id)
-    .then(data =>
+    .then((data) =>
       data
         ? res.json(data)
         : next(
@@ -111,7 +113,7 @@ function match(req, res, next) {
 function matchlist(req, res, next) {
   apiService
     .matchlist(req.params.id)
-    .then(data =>
+    .then((data) =>
       data
         ? res.json(data)
         : next(
@@ -127,7 +129,7 @@ function matchlist(req, res, next) {
 function matchtimeline(req, res, next) {
   apiService
     .matchtimeline(req.params.id)
-    .then(data =>
+    .then((data) =>
       data
         ? res.json(data)
         : next(
@@ -139,7 +141,7 @@ function matchtimeline(req, res, next) {
           ),
     );
 }
-*/
+
 //Summoner
 router.get(
   "/summoner/name/:name",
@@ -190,7 +192,6 @@ router.get(
   masteryStats,
 );
 
-/*
 router.get("/match/:id", checkToken(), validate, authorize(), match);
 router.get(
   "/matchlist/:id",
@@ -207,5 +208,5 @@ router.get(
   authorize(),
   matchtimeline,
 );
-*/
+
 module.exports = router;

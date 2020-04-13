@@ -1,7 +1,9 @@
 const TeemoJS = require("teemojs");
 let api = TeemoJS(process.env.RGAPI);
-const ErrorHelper = require("../_helpers/error-helper");
+const ErrorHelper = require("./error-helper");
 
+// using a package the Riot-API is called
+//https://github.com/MingweiSamuel/TeemoJS
 async function summonerById(summonerId) {
   const data = api
     .get("euw1", "summoner.getBySummonerId", summonerId)
