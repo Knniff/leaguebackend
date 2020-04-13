@@ -210,12 +210,3 @@ router.get(
 );
 
 module.exports = router;
-
-/* 
-
-just testing the branch update
-lulu
-
-
-
-*/
