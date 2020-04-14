@@ -60,3 +60,5 @@ router.get(
   authorize(),
   summonerById,
 );
+
+module.exports = router;

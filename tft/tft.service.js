@@ -50,3 +50,8 @@ async function summoner(summonerId) {
     return summoner;
   }
 }
+
+//export the function so it can be used/imported in tft controller
+module.exports = {
+  summoner,
+};
