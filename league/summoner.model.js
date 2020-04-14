@@ -4,10 +4,10 @@ const { Schema } = mongoose;
 
 const schema = new Schema(
   {
-    summonerId: { type: String, required: true },
+    summonerId: { type: String, required: true, index: true },
     accountId: { type: String, required: true },
     puuid: { type: String, required: true },
-    summonerName: { type: String, required: true },
+    summonerName: { type: String, required: true, index: true },
     summonerLevel: { type: Number, required: true },
     iconId: { type: Number, required: true },
     serverId: { type: String, required: true },

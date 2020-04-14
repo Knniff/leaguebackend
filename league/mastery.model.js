@@ -6,6 +6,7 @@ const schema = new Schema(
   {
     championId: {
       type: Number,
+      index: true,
     },
     championLevel: {
       type: Number,
@@ -30,6 +31,7 @@ const schema = new Schema(
     },
     summonerId: {
       type: String,
+      index: true,
     },
   },
   { timestamps: true },
