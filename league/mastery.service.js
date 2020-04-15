@@ -178,13 +178,6 @@ async function summoner(summonerId) {
       .catch((err) => {
         throw err;
       });
-    if (data.status) {
-      throw new ErrorHelper(
-        "Internal Server Error",
-        data.status.status_code,
-        "Riot-API failure or wrong API-key.",
-      );
-    }
     oldSummoner.summonerName = data.name;
     oldSummoner.summonerLevel = data.summonerLevel;
     oldSummoner.iconId = data.profileIconId;
@@ -196,13 +189,6 @@ async function summoner(summonerId) {
       .catch((err) => {
         throw err;
       });
-    if (data.status) {
-      throw new ErrorHelper(
-        "Internal Server Error",
-        data.status.status_code,
-        "Riot-API failure or wrong API-key.",
-      );
-    }
     const summoner = new Summoner();
     summoner.summonerId = data.id;
     summoner.accountId = data.accountId;

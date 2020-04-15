@@ -1,6 +1,7 @@
 const TeemoJS = require("teemojs");
 let api = TeemoJS(process.env.RGAPI);
 const ErrorHelper = require("./error-helper");
+const fs = require("fs");
 
 // using a package the Riot-API is called
 //https://github.com/MingweiSamuel/TeemoJS
@@ -15,6 +16,13 @@ async function summonerById(summonerId) {
         err.message,
       );
     });
+  if (data.status) {
+    throw new ErrorHelper(
+      "Internal Server Error",
+      data.status.status_code,
+      "Riot-API failure or wrong API-key.",
+    );
+  }
   return data;
 }
 
@@ -66,8 +74,91 @@ async function match(matchId) {
 }
 
 async function matchlist(accountId) {
-  const data = await api.get("euw1", "match.getMatchlist", accountId);
-  return data;
+  var count = 0;
+  var matchlist = [];
+  var beginIndex = 0;
+  /*   let rawData = fs.readFileSync("./_helpers/patches.json");
+  const patches = JSON.parse(rawData);
+  var tempstart = 0;
+  var tempend = 0;
+  season = 10;
+  //patch = 10.8;
+  if (season && !patch) {
+    let startindex = -1;
+    let endindex = -1;
+    let start;
+    let end;
+    start = (season + 0.1).toString();
+    end = (start + 1).toString();
+    startindex = patches.patches.findIndex(
+      (element) => element.name === start,
+    );
+    endindex = patches.patches.findIndex(
+      (element) => element.name === end,
+    );
+    tempstart = patches.patches[startindex].start;
+    if (!patches.patches[endindex]) {
+      tempend = Date.now();
+    } else {
+      tempend = patches.patches[endindex].start;
+    }
+    console.log(tempend - tempstart);
+  } else if (!season && patch) {
+    let startindex = -1;
+    let endindex = -1;
+    let start;
+    let end;
+    start = patch.toString();
+    end = (patch + 0.1).toString();
+    startindex = patches.patches.findIndex(
+      (element) => element.name === start,
+    );
+    endindex = patches.patches.findIndex(
+      (element) => element.name === end,
+    );
+    tempstart = patches.patches[startindex].start;
+    if (!patches.patches[endindex]) {
+      tempend = Date.now();
+    } else {
+      tempend = patches.patches[endindex].start;
+    }
+    console.log(tempend - tempstart);
+  } */
+  while (1 === 1) {
+    const data = await api
+      .get("euw1", "match.getMatchlist", accountId, {
+        beginIndex: beginIndex,
+      })
+      .catch((err) => {
+        console.log(err);
+        throw new ErrorHelper(
+          "Internal Server Error",
+          err.status_code,
+          err.message,
+        );
+      });
+    if (data.status) {
+      throw new ErrorHelper(
+        "Internal Server Error",
+        data.status.status_code,
+        "Riot-API failure or wrong API-key.",
+      );
+    }
+    if (!data.matches.length) {
+      console.log("break");
+      break;
+    }
+    matchlist = matchlist.concat(data.matches);
+    beginIndex = beginIndex + 100;
+    console.log(beginIndex);
+  }
+
+  matchlist.forEach((element) => {
+    count = count + 1;
+    element.timestamp = new Date(element.timestamp);
+  });
+  console.log(count);
+  return matchlist;
 }
 
 async function matchtimeline(matchId) {

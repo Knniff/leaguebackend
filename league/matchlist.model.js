@@ -4,8 +4,11 @@ const { Schema } = mongoose;
 
 const schema = new Schema(
   {
-    matchId: { type: Number, required: true },
-    summonerId: { type: String, required: true },
+    matchId: { type: Number, required: true, index: true },
+    summonerId: { type: String, required: true, index: true },
+    championId: { type: Number, required: true, index: true },
+    patch: { type: Number, required: true, index: true },
+    role: { type: String, required: false, index: true },
   },
   { timestamps: true },
 );
