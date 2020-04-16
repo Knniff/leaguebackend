@@ -25,7 +25,7 @@ async function matchlist(summonerId) {
     });
 
   apiMatchlist.forEach((element) => {
-    let match = new Matchlist();
+    let match = new Match();
     match.matchId = element.gameId;
     match.summonerId = summonerId;
     match.championId = element.champion;
