@@ -73,6 +73,11 @@ async function match(matchId) {
   return data;
 }
 
+async function tft_challenger(matchId) {
+  const data = await api.get("euw1", "match.getMatch", matchId);
+  return data;
+}
+
 async function matchlist(accountId) {
   var count = 0;
   var matchlist = [];
