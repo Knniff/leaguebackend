@@ -1,6 +1,7 @@
 const express = require("express");
 const { checkToken, validate } = require("../_helpers/validator");
 const masteryService = require("./mastery.service");
+const matchService = require("./match.service");
 const apiService = require("../_helpers/api.service");
 const authorize = require("../_helpers/authorize");
 const ErrorHelper = require("../_helpers/error-helper");
@@ -97,51 +98,30 @@ function masteryStats(req, res, next) {
 function match(req, res, next) {
   apiService
     .match(req.params.id)
-    .then((data) =>
-      data
-        ? res.json(data)
-        : next(
-            new ErrorHelper(
-              "Not Found",
-              404,
-              "Wrong ID or no User found.",
-            ),
-          ),
-    );
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
 }
 
 function matchlist(req, res, next) {
   apiService
     .matchlist(req.params.id)
-    .then((data) =>
-      data
-        ? res.json(data)
-        : next(
-            new ErrorHelper(
-              "Not Found",
-              404,
-              "Wrong ID or no User found.",
-            ),
-          ),
-    );
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
 }
 
 function matchtimeline(req, res, next) {
   apiService
     .matchtimeline(req.params.id)
-    .then((data) =>
-      data
-        ? res.json(data)
-        : next(
-            new ErrorHelper(
-              "Not Found",
-              404,
-              "Wrong ID or no User found.",
-            ),
-          ),
-    );
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
 }
 
+function allmatches(req, res, next) {
+  matchService
+    .allMatches(req.params.id)
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
+}
 //Summoner
 router.get(
   "/summoner/name/:name",
@@ -191,8 +171,17 @@ router.get(
   authorize(),
   masteryStats,
 );
-
+// match
 router.get("/match/:id", checkToken(), validate, authorize(), match);
+
+router.get(
+  "/allmatches/:id",
+  checkToken(),
+  validate,
+  authorize(),
+  allmatches,
+);
+
 router.get(
   "/matchlist/:id",
   checkToken(),

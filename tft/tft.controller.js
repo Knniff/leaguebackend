@@ -39,10 +39,6 @@ function summonerById(req, res, next) {
     .then((data) => res.json(data))
     .catch((err) => next(err));
 }
-function challengerTFT(req, res, next) {
-  apiService.tft_challenger().then((data) => res.json(data))
-  .catch((err) => next(err));
-}
 
 //Routes
 /* 
@@ -65,8 +61,5 @@ router.get(
   authorize(),
   summonerById,
 );
-router.get(
-  "/challenger",
-  challengerTFT,
-);
+
 module.exports = router;

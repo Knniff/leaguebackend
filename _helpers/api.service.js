@@ -69,12 +69,16 @@ async function mastery(summonerId) {
 }
 
 async function match(matchId) {
-  const data = await api.get("euw1", "match.getMatch", matchId);
-  return data;
-}
-
-async function tft_challenger() {
-  const data = await api.get("euw1", "tftLeague.getChallengerLeague");
+  const data = await api
+    .get("euw1", "match.getMatch", matchId)
+    .catch((err) => {
+      console.log(err);
+      throw new ErrorHelper(
+        "Internal Server Error",
+        err.status_code,
+        err.message,
+      );
+    });
   return data;
 }
 
@@ -182,5 +186,4 @@ module.exports = {
   match,
   matchlist,
   matchtimeline,
-  tft_challenger,
 };
