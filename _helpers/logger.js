@@ -11,8 +11,13 @@ const streamToElastic = pinoElastic({
   "bulk-size": 200,
   ecs: true,
 });
+var logger;
+if (process.env.NODE_ENV === "development") {
+  logger = pino({ level: "info", prettyPrint: true });
+} else {
+  logger = pino({ level: "info" });
+}
 
-const logger = pino({ level: "info", prettyPrint: true });
 //const logger = pino({ level: "info" }, streamToElastic);
 
 const expressLogger = expressPino({ logger: logger });

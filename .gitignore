@@ -40,3 +40,6 @@ typings
 # Ignore config
 .vscode
 .env
+Dockerfile
+.dockerignore
+docker-compose.yml

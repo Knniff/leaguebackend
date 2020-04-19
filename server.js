@@ -19,7 +19,7 @@ app.use(helmet());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
-//specific rootes: see the named file
+//specific routes: see the named file
 app.use("/users", require("./users/users.controller"));
 app.use("/league", require("./league/league.controller"));
 app.use("/tft", require("./tft/tft.controller"));
