@@ -190,7 +190,6 @@ async function summoner(summonerId) {
         throw err;
       });
     const summoner = new Summoner();
-    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment
     summoner.summonerId = data.id;
     summoner.accountId = data.accountId;
     summoner.puuid = data.puuid;

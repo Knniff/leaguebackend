@@ -10,59 +10,56 @@ const banSchema = new Schema({
   },
 });
 
-const teamSchema = new Schema(
-  {
-    teamId: {
-      type: Number,
-    },
-    win: {
-      type: Boolean,
-    },
-    firstBlood: {
-      type: Boolean,
-    },
-    firstTower: {
-      type: Boolean,
-    },
-    firstInhibitor: {
-      type: Boolean,
-    },
-    firstBaron: {
-      type: Boolean,
-    },
-    firstDragon: {
-      type: Boolean,
-    },
-    firstRiftHerald: {
-      type: Boolean,
-    },
-    towerKills: {
-      type: Number,
-    },
-    inhibitorKills: {
-      type: Number,
-    },
-    baronKills: {
-      type: Number,
-    },
-    dragonKills: {
-      type: Number,
-    },
-    vilemawKills: {
-      type: Number,
-    },
-    riftHeraldKills: {
-      type: Number,
-    },
-    dominionVictoryScore: {
-      type: Number,
-    },
-    bans: {
-      type: [banSchema],
-    },
+const teamSchema = new Schema({
+  teamId: {
+    type: Number,
   },
-  { timestamps: true },
-);
+  win: {
+    type: Boolean,
+  },
+  firstBlood: {
+    type: Boolean,
+  },
+  firstTower: {
+    type: Boolean,
+  },
+  firstInhibitor: {
+    type: Boolean,
+  },
+  firstBaron: {
+    type: Boolean,
+  },
+  firstDragon: {
+    type: Boolean,
+  },
+  firstRiftHerald: {
+    type: Boolean,
+  },
+  towerKills: {
+    type: Number,
+  },
+  inhibitorKills: {
+    type: Number,
+  },
+  baronKills: {
+    type: Number,
+  },
+  dragonKills: {
+    type: Number,
+  },
+  vilemawKills: {
+    type: Number,
+  },
+  riftHeraldKills: {
+    type: Number,
+  },
+  dominionVictoryScore: {
+    type: Number,
+  },
+  bans: {
+    type: [banSchema],
+  },
+});
 
 const schema = new Schema(
   {
