@@ -4,9 +4,9 @@ const ErrorHelper = require("./error-helper");
 
 // using a package the Riot-API is called
 //https://github.com/MingweiSamuel/TeemoJS
-async function summonerById(summonerId) {
+async function summonerById(summonerId, serverId) {
   const data = api
-    .get("euw1", "summoner.getBySummonerId", summonerId)
+    .get(serverId, "summoner.getBySummonerId", summonerId)
     .catch((err) => {
       console.log(err);
       throw new ErrorHelper(
@@ -39,6 +39,20 @@ async function summonerByName(name) {
   } else {
     return data;
   }
+}
+
+async function summonerBypuuId(puuId, serverId) {
+  const data = api
+    .get(serverId, "summoner.getByPUUID", puuId)
+    .catch((err) => {
+      console.log(err);
+      throw new ErrorHelper(
+        "Internal Server Error",
+        err.status_code,
+        err.message,
+      );
+    });
+  return data;
 }
 
 async function mastery(summonerId) {
@@ -79,11 +93,64 @@ async function matchtimeline(matchId) {
   return data;
 }
 
+async function tft_challenger(server) {
+  const data = await api.get(server, "tftLeague.getChallengerLeague");
+  console.log(data.entries[0].summonerId);
+  return data;
+}
+
+async function tft_MatchlistFromPuuid(puuid, server) {
+  const data = await api.get(
+    server,
+    "tftMatch.getMatchIdsByPUUID",
+    puuid,
+    { count: 20 },
+  );
+  return data;
+}
+
+async function tft_Match(matchId) {
+  const toCheck = matchId.split("_")[0];
+  var serverRegion;
+  console.log(toCheck);
+
+  switch (toCheck) {
+    case "EUNE1":
+    case "TR1":
+    case "RU1":
+    case "EUW1":
+      serverRegion = "europe";
+      break;
+    case "NA1":
+    case "LAN1":
+    case "LAS1":
+    case "OCE1":
+    case "BR1":
+      serverRegion = "americas";
+      break;
+    case "KR1":
+    case "JP1":
+      serverRegion = "asia";
+      break;
+  }
+  console.log(serverRegion);
+  const data = await api.get(
+    serverRegion,
+    "tftMatch.getMatch",
+    matchId,
+  );
+  return data;
+}
+
 module.exports = {
   summonerById,
   summonerByName,
+  summonerBypuuId,
   mastery,
   match,
   matchlist,
   matchtimeline,
+  tft_challenger,
+  tft_MatchlistFromPuuid,
+  tft_Match,
 };

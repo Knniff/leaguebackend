@@ -38,7 +38,12 @@ function summonerById(req, res, next) {
     .then((data) => res.json(data))
     .catch((err) => next(err));
 }
-
+function summonerById(req, res, next) {
+  tftService
+    .summoner(req.params.id)
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
+}
 //Routes
 /* 
 Example:
@@ -52,6 +57,41 @@ router.get(
 ); 
 
 */
+function challenger(req, res, next) {
+  tftService
+    .challenger(req.params.server)
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
+}
+
+function getMatchlist(req, res, next) {
+  tftService
+    .getMatchList(
+      req.params.summonerId,
+      req.query.server,
+      req.query.serverRegion,
+    )
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
+}
+
+function match(req, res, next) {
+  tftService
+    .match(req.params.matchId)
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
+}
+function winner(req, res, next) {
+  tftService
+    .winner(req.params.matchId)
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
+}
+function calculateMeta(req, res, next) {
+  tftService
+    .calculateMeta(req.params.serverId, req.query.serverRegion)
+    .then((data) => res.json(data));
+}
 
 router.get(
   "/summoner/id/:id",
@@ -60,5 +100,30 @@ router.get(
   authorize(),
   summonerById,
 );
+router.get("/challenger/:server", challenger);
+
+router.get("/test/:summonerId", getMatchlist);
+
+router.get("/match/:matchId", match);
+
+router.get("/winner/:matchId", winner);
+router.get("/update/meta/:serverId", calculateMeta);
 
 module.exports = router;
+
+/* Plan for TFT Meta:
+  - request the challenger ladder from riot-api (maybe later make it a choice which league to use, for comparing metas between divisions)
+  - pick ONLY the summonername of the entrieslist
+    !!!REPEAT FOR EACH INDIVUAL!!!
+    - check their profile through tft-summoner in the riot-api
+    - pick ONLY their puuid
+    - use puuid to check for matchid though tft-match in the riot api
+      !!!REPEAT FOR EACH INDIVUAL!!!
+      - use the matchid to look up the match through tft-match in the riot api
+      - scan the data for the 4 last-kicked and pick up their comb (maybe later champions used aswell)
+      - upload into our db
+  - from our own db rank these combs by win-percentage and popularity
+  Ideas for later
+    - add things surrounding items and meta/winrate
+      - popular itembuilds on particular champs etc.
+*/

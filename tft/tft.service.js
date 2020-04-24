@@ -4,7 +4,7 @@ const ErrorHelper = require("../_helpers/error-helper");
 //instatiating the database: look at the database file for more info
 const db = require("../_helpers/db");
 // loads the Mastery and Summoner Model
-const { Summoner } = db;
+const { Summoner, TFT_Meta } = db;
 
 async function summoner(summonerId) {
   //find a summoner by their id in the database. if the "await" keyword would be missing then the funtion would fail because the next lines would try to read and write data that isnt there yet, because the Promise isnt resolved yet.
@@ -51,7 +51,78 @@ async function summoner(summonerId) {
   }
 }
 
+async function challenger(serverId) {
+  const data = await apiService.tft_challenger(serverId);
+  return data;
+}
+
+async function getMatchList(summonerId, serverId, serverRegion) {
+  const data = await apiService.summonerById(summonerId, serverId);
+  const puuid = data.puuid;
+  const data2 = await apiService.tft_MatchlistFromPuuid(
+    puuid,
+    serverRegion,
+  );
+  console.log(data2[0]);
+  return data2;
+}
+
+async function match(matchId) {
+  const data = await apiService.tft_Match(matchId);
+  return data;
+}
+
+async function winner(matchId) {
+  const checkMatchId = await TFT_Meta.findOne({ matchId: matchId });
+  if (checkMatchId) {
+    return "existiert schon";
+  }
+  const data = await match(matchId);
+  data.info.participants.forEach((element) => {
+    if (element.placement === 1) {
+      let activeTraits = [];
+      element.traits.forEach((i) => {
+        if (i.tier_current !== 0) {
+          activeTraits.push(i);
+        }
+      });
+
+      let data = new TFT_Meta();
+      data.matchId = matchId;
+      data.traits = activeTraits;
+      data.units = element.units;
+      data.companion = element.companion.species;
+
+      data.save();
+    }
+  });
+  return "hat geklappt junge";
+}
+
+async function calculateMeta(serverId, serverRegion) {
+  const ladder = await challenger(serverId);
+  const entries = ladder.entries;
+  for (i = 0; i < entries.length; i++) {
+    let summonerId = entries[i].summonerId;
+    let matchList = await getMatchList(
+      summonerId,
+      serverId,
+      serverRegion,
+    );
+    for (x = 0; x < matchList.length; x++) {
+      winner(matchList[x]);
+    }
+  }
+
+  return "Added new Data in metas";
+} //später noch Elo
+
 //export the function so it can be used/imported in tft controller
 module.exports = {
   summoner,
+  challenger,
+  getMatchList,
+  match,
+  winner,
+  calculateMeta,
 };
