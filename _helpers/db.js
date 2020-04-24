@@ -8,7 +8,7 @@ const participant = require("../league/participant.model");
 const team = require("../league/team.model");
 const mastery = require("../league/mastery.model");
 const matchlist = require("../league/matchlist.model");
-const tft_meta = require("../tft/meta.model");
+const tft_metadata = require("../tft/metadata.model");
 const log = require("./logger");
 
 //activates debug statements for troubleshooting
@@ -46,6 +46,6 @@ module.exports = {
   Team: team,
   Mastery: mastery,
   Matchlist: matchlist,
-  TFT_Meta: tft_meta,
+  TFT_MetaData: tft_metadata,
   dropDB,
 };

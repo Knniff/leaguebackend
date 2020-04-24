@@ -90,8 +90,7 @@ function winner(req, res, next) {
 function calculateMeta(req, res, next) {
   tftService
     .calculateMeta(req.params.serverId, req.query.serverRegion)
-    .then((data) => res.json(data))
-    .catch((err) => next(err));
+    .then((data) => res.json(data));
 }
 function winrateByPet(req, res, next) {
   tftService

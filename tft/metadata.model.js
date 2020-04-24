@@ -19,13 +19,14 @@ const units = new Schema({
 const schema = new Schema(
   {
     matchId: { type: String, required: true, index: true },
+    game_version: { type: String, required: false },
     traits: { type: [traits], required: true },
     units: { type: [units], required: true },
     companion: { type: String },
   },
-  { timestamps: true },
+  { timestamps: false },
 );
 
 schema.set("toJSON", { virtuals: true });
 
-module.exports = mongoose.model("Meta", schema);
+module.exports = mongoose.model("MetaData", schema);

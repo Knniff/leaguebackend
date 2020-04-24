@@ -4,7 +4,7 @@ const ErrorHelper = require("../_helpers/error-helper");
 //instatiating the database: look at the database file for more info
 const db = require("../_helpers/db");
 // loads the Mastery and Summoner Model
-const { Summoner, TFT_Meta } = db;
+const { Summoner, TFT_MetaData } = db;
 
 async function summoner(summonerId) {
   //find a summoner by their id in the database. if the "await" keyword would be missing then the funtion would fail because the next lines would try to read and write data that isnt there yet, because the Promise isnt resolved yet.
@@ -63,7 +63,7 @@ async function getMatchList(summonerId, serverId, serverRegion) {
     puuid,
     serverRegion,
   );
-  console.log(data2[0] + "  OG getMatchlist");
+  console.log("Matchlistcount:" + data2.length);
   return data2;
 }
 
@@ -73,7 +73,9 @@ async function match(matchId) {
 }
 
 async function winner(matchId) {
-  const checkMatchId = await TFT_Meta.findOne({ matchId: matchId });
+  const checkMatchId = await TFT_MetaData.findOne({
+    matchId: matchId,
+  });
   if (checkMatchId) {
     console.log("Match already processed!");
     return;
@@ -88,13 +90,14 @@ async function winner(matchId) {
         }
       });
 
-      let data = new TFT_Meta();
-      data.matchId = matchId;
-      data.traits = activeTraits;
-      data.units = element.units;
-      data.companion = element.companion.species;
+      let newMetaData = new TFT_MetaData();
+      newMetaData.matchId = matchId;
+      newMetaData.game_version = data.info.game_version;
+      newMetaData.traits = activeTraits;
+      newMetaData.units = element.units;
+      newMetaData.companion = element.companion.species;
 
-      data.save();
+      newMetaData.save();
     }
   });
   console.log("Successfully added " + matchId);
@@ -104,7 +107,9 @@ async function winner(matchId) {
 async function calculateMeta(serverId, serverRegion) {
   const ladder = await challenger(serverId);
   const entries = ladder.entries;
+
   for (i = 0; i < entries.length; i++) {
+    var test_count_test = 0;
     let summonerId = entries[i].summonerId;
     let matchList = await getMatchList(
       summonerId,
@@ -113,14 +118,16 @@ async function calculateMeta(serverId, serverRegion) {
     );
     for (x = 0; x < matchList.length; x++) {
       winner(matchList[x]);
+      test_count_test++;
     }
+    console.log(test_count_test);
   }
-
-  return "Added new Data in metas";
+  console.log("MetaDatas got updated!");
+  return "Added new Data in metadatas";
 } //später noch Elo
 
 async function winrateByPet() {
-  const data = await TFT_Meta.find();
+  const data = await TFT_MetaData.find();
   var allPets = [];
 
   //put all companions inside the variable allPets
@@ -135,15 +142,21 @@ async function winrateByPet() {
   for (var i = 0; i < uniquePets.length; i++) {
     let lastIndex = 0;
     let count = 0;
-    while (lastIndex > -1) {
+    while (true) {
       lastIndex = allPets.indexOf(uniquePets[i], lastIndex + 1);
+      if (lastIndex === -1) {
+        break;
+      }
       count++;
     }
+
+    //now push all the values together so a structure forms. name, totalcount, winrate in %. Its possible to access the data with .indexOf(name) and a +1 for total count or +2 for percent
     totalAmountOfEachPet.push(uniquePets[i]);
     totalAmountOfEachPet.push(count);
     var percent = (count / allPets.length) * 100;
     totalAmountOfEachPet.push(percent.toPrecision(3));
   }
+  console.log(allPets.length + " Little Legends tested!");
   return totalAmountOfEachPet;
 }
 
