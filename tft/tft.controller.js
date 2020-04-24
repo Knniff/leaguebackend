@@ -90,9 +90,15 @@ function winner(req, res, next) {
 function calculateMeta(req, res, next) {
   tftService
     .calculateMeta(req.params.serverId, req.query.serverRegion)
-    .then((data) => res.json(data));
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
 }
-
+function winrateByPet(req, res, next) {
+  tftService
+    .winrateByPet()
+    .then((data) => res.json(data))
+    .catch((err) => next(err));
+}
 router.get(
   "/summoner/id/:id",
   checkToken(),
@@ -108,6 +114,8 @@ router.get("/match/:matchId", match);
 
 router.get("/winner/:matchId", winner);
 router.get("/update/meta/:serverId", calculateMeta);
+
+router.get("/wpet", winrateByPet);
 
 module.exports = router;
 

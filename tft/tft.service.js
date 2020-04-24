@@ -63,7 +63,7 @@ async function getMatchList(summonerId, serverId, serverRegion) {
     puuid,
     serverRegion,
   );
-  console.log(data2[0]);
+  console.log(data2[0] + "  OG getMatchlist");
   return data2;
 }
 
@@ -75,7 +75,8 @@ async function match(matchId) {
 async function winner(matchId) {
   const checkMatchId = await TFT_Meta.findOne({ matchId: matchId });
   if (checkMatchId) {
-    return "existiert schon";
+    console.log("Match already processed!");
+    return;
   }
   const data = await match(matchId);
   data.info.participants.forEach((element) => {
@@ -96,7 +97,8 @@ async function winner(matchId) {
       data.save();
     }
   });
-  return "hat geklappt junge";
+  console.log("Successfully added " + matchId);
+  return;
 }
 
 async function calculateMeta(serverId, serverRegion) {
@@ -117,6 +119,39 @@ async function calculateMeta(serverId, serverRegion) {
   return "Added new Data in metas";
 } //später noch Elo
 
+async function winrateByPet() {
+  const data = await TFT_Meta.find();
+  var allPets = [];
+
+  //put all companions inside the variable allPets
+  data.forEach((element) => {
+    allPets.push(element.companion);
+  });
+
+  //put each unique companion into a new array
+  var uniquePets = allPets.filter(onlyUnique);
+  var totalAmountOfEachPet = [];
+
+  for (var i = 0; i < uniquePets.length; i++) {
+    let lastIndex = 0;
+    let count = 0;
+    while (lastIndex > -1) {
+      lastIndex = allPets.indexOf(uniquePets[i], lastIndex + 1);
+      count++;
+    }
+    totalAmountOfEachPet.push(uniquePets[i]);
+    totalAmountOfEachPet.push(count);
+    var percent = (count / allPets.length) * 100;
+    totalAmountOfEachPet.push(percent.toPrecision(3));
+  }
+  return totalAmountOfEachPet;
+}
+
+//dont ask me how this works. its copied: https://stackoverflow.com/questions/1960473/get-all-unique-values-in-a-javascript-array-remove-duplicates
+function onlyUnique(value, index, self) {
+  return self.indexOf(value) === index;
+}
+
 //export the function so it can be used/imported in tft controller
 module.exports = {
   summoner,
@@ -125,4 +160,5 @@ module.exports = {
   match,
   winner,
   calculateMeta,
+  winrateByPet,
 };

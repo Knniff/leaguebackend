@@ -95,7 +95,6 @@ async function matchtimeline(matchId) {
 
 async function tft_challenger(server) {
   const data = await api.get(server, "tftLeague.getChallengerLeague");
-  console.log(data.entries[0].summonerId);
   return data;
 }
 
@@ -112,8 +111,6 @@ async function tft_MatchlistFromPuuid(puuid, server) {
 async function tft_Match(matchId) {
   const toCheck = matchId.split("_")[0];
   var serverRegion;
-  console.log(toCheck);
-
   switch (toCheck) {
     case "EUNE1":
     case "TR1":
@@ -133,7 +130,6 @@ async function tft_Match(matchId) {
       serverRegion = "asia";
       break;
   }
-  console.log(serverRegion);
   const data = await api.get(
     serverRegion,
     "tftMatch.getMatch",
