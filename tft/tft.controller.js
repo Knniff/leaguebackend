@@ -1,7 +1,7 @@
 const express = require("express");
 const { checkToken, validate } = require("../_helpers/validator");
 const tftService = require("./tft.service");
-const authorize = require("../_helpers/authorize");
+const { authorize, authenticate } = require("../_helpers/authorize");
 const ErrorHelper = require("../_helpers/error-helper");
 
 const router = express.Router();
@@ -57,6 +57,7 @@ router.get(
   "/summoner/id/:id",
   checkToken(),
   validate,
+  authenticate,
   authorize(),
   summonerById,
 );
