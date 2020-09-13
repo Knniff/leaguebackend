@@ -933,6 +933,14 @@ describe("/users", function () {
   });
   describe("DELETE /", function () {
     describe("Successes", function () {
+      it("respond with 200 ok, because he is allowed to delete himself", async function () {
+        await createUser();
+        const user = await login(userLoginData);
+        await request(app)
+          .delete(`/users/${user.body._id}`)
+          .set("Authorization", `Bearer ${user.body.accessToken}`)
+          .expect(200);
+      });
       it("respond with 200 ok, because admins are allowed to delete all users", async function () {
         await createAdmin();
         await createUser();
@@ -941,14 +949,6 @@ describe("/users", function () {
         await request(app)
           .delete(`/users/${user.body._id}`)
           .set("Authorization", `Bearer ${admin.body.accessToken}`)
-          .expect(200);
-      });
-      it("respond with 200 ok, because he is allowed to delete himself", async function () {
-        await createUser();
-        const user = await login(userLoginData);
-        await request(app)
-          .delete(`/users/${user.body._id}`)
-          .set("Authorization", `Bearer ${user.body.accessToken}`)
           .expect(200);
       });
     });
