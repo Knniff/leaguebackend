@@ -64,9 +64,7 @@ const registerValidationRules = () => {
       .isLength({ max: 25 })
       .withMessage("Too long, not more then 25 characters."),
     // lastname must not be empty
-    body("role")
-      .not()
-      .exists(),
+    body("role").not().exists(),
   ];
 };
 
@@ -86,7 +84,8 @@ const updateValidationRules = () => {
       .withMessage(
         "Too short or too long, needs atleast 8 characters and not more then 25.",
       )
-      .optional(),
+      .exists()
+      .withMessage("Has to exist."),
     // firstname must not be empty
     body("firstName")
       .notEmpty()
@@ -104,9 +103,7 @@ const updateValidationRules = () => {
       .isLength({ max: 25 })
       .withMessage("Too long, not more then 25 characters."),
     // lastname must not be empty
-    body("role")
-      .not()
-      .exists(),
+    body("role").not().exists(),
     param("id")
       .isLength({ min: 24, max: 24 })
       .withMessage("ID must be exactly 24 Characters long."),
@@ -114,7 +111,7 @@ const updateValidationRules = () => {
 };
 
 const checkId = () => {
-  //id must be exactly 24 chars long
+  // id must be exactly 24 chars long
   return param("id")
     .isLength({ min: 24, max: 24 })
     .withMessage("ID must be exactly 24 Characters long.");
@@ -122,6 +119,16 @@ const checkId = () => {
 
 const checkToken = () => {
   return header("authorization")
+    .notEmpty()
+    .withMessage("Not Allowed to be empty.")
+    .exists()
+    .withMessage("Has to exist.")
+    .isLength({ min: 8 })
+    .withMessage("Too short for a JWT.");
+};
+
+const checkRefreshToken = () => {
+  return body("refreshToken")
     .notEmpty()
     .withMessage("Not Allowed to be empty.")
     .exists()
@@ -138,7 +145,7 @@ const validate = (req, res, next) => {
   const extractedErrors = [];
   errors
     .array()
-    .map(err => extractedErrors.push({ [err.param]: err.msg }));
+    .map((err) => extractedErrors.push({ [err.param]: err.msg }));
 
   throw new ErrorHelper("Validation Error", 422, extractedErrors);
 };
@@ -149,5 +156,6 @@ module.exports = {
   updateValidationRules,
   checkId,
   checkToken,
+  checkRefreshToken,
   validate,
 };

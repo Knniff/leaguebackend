@@ -1,5 +1,6 @@
 //instantiating the core packages
 //server package
+require("dotenv").config();
 const express = require("express");
 //additional server helpers
 const cors = require("cors");
@@ -8,7 +9,7 @@ const bodyParser = require("body-parser");
 //selfbuilt error handler
 const errorHandler = require("./_helpers/error-handler");
 //custom logger
-const log = require("./_helpers/logger");
+//const log = require("./_helpers/logger");
 
 //bind the server package to the variable: app
 const app = express();

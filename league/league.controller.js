@@ -2,7 +2,7 @@ const express = require("express");
 const { checkToken, validate } = require("../_helpers/validator");
 const masteryService = require("./mastery.service");
 const apiService = require("../_helpers/api.service");
-const authorize = require("../_helpers/authorize");
+const { authorize, authenticate } = require("../_helpers/authorize");
 const ErrorHelper = require("../_helpers/error-helper");
 
 const router = express.Router();
@@ -147,6 +147,7 @@ router.get(
   "/summoner/name/:name",
   checkToken(),
   validate,
+  authenticate,
   authorize(),
   summonerByName,
 );
@@ -155,16 +156,25 @@ router.get(
   "/summoner/id/:id",
   checkToken(),
   validate,
+  authenticate,
   authorize(),
   summonerById,
 );
 //Mastery
-router.get("/mastery", checkToken(), validate, authorize(), mastery);
+router.get(
+  "/mastery",
+  checkToken(),
+  validate,
+  authenticate,
+  authorize(),
+  mastery,
+);
 
 router.get(
   "/mastery/summoner/:id",
   checkToken(),
   validate,
+  authenticate,
   authorize(),
   summonerMastery,
 );
@@ -172,6 +182,7 @@ router.get(
   "/mastery/champion/:id",
   checkToken(),
   validate,
+  authenticate,
   authorize(),
   championMastery,
 );
@@ -180,6 +191,7 @@ router.put(
   "/mastery/update/:id",
   checkToken(),
   validate,
+  authenticate,
   authorize(),
   updateSummonerMastery,
 );
@@ -188,15 +200,24 @@ router.get(
   "/mastery/stats/:id",
   checkToken(),
   validate,
+  authenticate,
   authorize(),
   masteryStats,
 );
 
-router.get("/match/:id", checkToken(), validate, authorize(), match);
+router.get(
+  "/match/:id",
+  checkToken(),
+  validate,
+  authenticate,
+  authorize(),
+  match,
+);
 router.get(
   "/matchlist/:id",
   checkToken(),
   validate,
+  authenticate,
   authorize(),
   matchlist,
 );
@@ -205,6 +226,7 @@ router.get(
   "/matchtimeline/:id",
   checkToken(),
   validate,
+  authenticate,
   authorize(),
   matchtimeline,
 );

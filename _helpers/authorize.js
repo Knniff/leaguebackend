@@ -1,47 +1,56 @@
-const expressJwt = require("express-jwt");
+const jwt = require("jsonwebtoken");
 const ErrorHelper = require("./error-helper");
 const userService = require("../users/user.service");
+// const Role = require("./role");
 
-function authorize(roles = []) {
-  // roles param can be a single role string (e.g. Role.User or 'User')
-  // or an array of roles (e.g. [Role.Admin, Role.User] or ['Admin', 'User'])
-  if (typeof roles === "string") {
-    // eslint-disable-next-line no-param-reassign
-    roles = [roles];
+const authenticate = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+
+    jwt.verify(
+      token,
+      process.env.ACCESSTOKENSECRET,
+      (error, user) => {
+        if (error) {
+          if (error.name === "TokenExpiredError") {
+            throw new ErrorHelper(
+              "TokenExpiredError",
+              401,
+              `The token used is expired: ${error.expiredAt}, you can refresh it at "/token".`,
+            );
+          } else {
+            throw new ErrorHelper(
+              "Unauthorized",
+              401,
+              "The token is invalid.",
+            );
+          }
+        }
+        userService.getById(user.sub).catch((err) => next(err));
+        req.user = user;
+        next();
+      },
+    );
   }
+};
 
-  return [
-    // authenticate JWT token and attach user to request object (req.user)
-    expressJwt({ secret: process.env.SECRET }),
-
-    // authorize based on user role
-    // eslint-disable-next-line consistent-return
-    (req, res, next) => {
-      if (roles.length && !roles.includes(req.user.role)) {
-        // user's role not authorized
-        throw new ErrorHelper(
-          "Unauthorized",
-          401,
-          "You dont have a role with the required Permissions for this.",
-        );
-      }
-      //check if user exists and fail if it doesnt
-      userService
-        .getById(req.user.sub)
-        .then(user =>
-          user
-            ? next()
-            : next(
-                new ErrorHelper(
-                  "Not Found",
-                  404,
-                  "The Token belongs to a deleted User.",
-                ),
-              ),
-        )
-        .catch(err => next(err));
-    },
-  ];
+function authorize(requiredrank = 0) {
+  return function authorizer(req, res, next) {
+    const userrole = JSON.parse(req.user.role);
+    if (userrole.rank >= requiredrank) {
+      return next();
+    }
+    throw new ErrorHelper(
+      "Unauthorized",
+      401,
+      "You dont have a role with the required Permissions for this.",
+    );
+  };
 }
 
-module.exports = authorize;
+module.exports = {
+  authorize,
+  authenticate,
+};
