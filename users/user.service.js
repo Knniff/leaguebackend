@@ -245,8 +245,9 @@ async function update(id, userParam) {
 }
 
 async function deleter(id) {
-  const user = await User.findByIdAndDelete(id);
-  console.log(user);
+  const user = await User.findByIdAndDelete(id).catch((err) =>
+    console.log(user),
+  );
   return user;
 }
 
