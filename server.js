@@ -1,4 +1,5 @@
 //instantiating the core packages
+require("dotenv").config();
 //server package
 const express = require("express");
 //additional server helpers

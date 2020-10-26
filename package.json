@@ -37,7 +37,7 @@
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.5.5",
-    "mongoose": "^5.9.7",
+    "mongoose": "^5.10.10",
     "pino": "^5.17.0",
     "pino-elasticsearch": "^4.4.0",
     "rootpath": "^0.1.2",

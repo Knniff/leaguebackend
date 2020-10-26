@@ -1,7 +1,12 @@
 const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
-
+const perkSchema = new Schema({
+  perkType: { type: Number },
+  perkStats1: { type: Number },
+  perkStats2: { type: Number },
+  perkStats3: { type: Number },
+});
 const schema = new Schema(
   {
     summonerId: { type: String, required: true, index: true },
@@ -12,9 +17,6 @@ const schema = new Schema(
     role: { type: String, required: true, index: true },
     spell1Id: { type: Number },
     spell2Id: { type: Number },
-    win: {
-      type: Boolean,
-    },
     item0: {
       type: Number,
     },
@@ -193,22 +195,22 @@ const schema = new Schema(
       type: Boolean,
     },
     perk0: {
-      type: Number,
+      type: perkSchema,
     },
     perk1: {
-      type: Number,
+      type: perkSchema,
     },
     perk2: {
-      type: Number,
+      type: perkSchema,
     },
     perk3: {
-      type: Number,
+      type: perkSchema,
     },
     perk4: {
-      type: Number,
+      type: perkSchema,
     },
     perk5: {
-      type: Number,
+      type: perkSchema,
     },
     perkPrimaryStyle: {
       type: Number,
