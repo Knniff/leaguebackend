@@ -9,6 +9,12 @@ const perkSchema = new Schema({
 });
 const schema = new Schema(
   {
+    duplicateCheck: {
+      type: String,
+      required: true,
+      indexes: true,
+      unique: true,
+    },
     summonerId: { type: String, required: true, index: true },
     matchId: { type: Number, required: true, index: true },
     championId: { type: Number, required: true, index: true },

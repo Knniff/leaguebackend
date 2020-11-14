@@ -63,7 +63,12 @@ const teamSchema = new Schema({
 
 const schema = new Schema(
   {
-    matchId: { type: Number, required: true, index: true },
+    matchId: {
+      type: Number,
+      required: true,
+      index: true,
+      unique: true,
+    },
     serverId: { type: String, required: true },
     type: { type: String, required: true, index: true },
     mode: { type: String, required: true, index: true },
@@ -72,7 +77,10 @@ const schema = new Schema(
     matchDate: { type: Date, required: true },
     patch: { type: Number, required: true, index: true },
     participants: { type: [String], required: true, index: true },
-    teams: { type: [teamSchema], required: true },
+    teams: {
+      blue: { type: teamSchema, required: true },
+      red: { type: teamSchema, required: true },
+    },
   },
   { timestamps: true },
 );

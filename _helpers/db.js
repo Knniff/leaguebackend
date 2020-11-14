@@ -4,6 +4,8 @@ const summoner = require("../league/summoner.model");
 const match = require("../league/match.model");
 const participant = require("../league/participant.model");
 const mastery = require("../league/mastery.model");
+const event = require("../league/event.model");
+const frame = require("../league/frame.model");
 const log = require("./logger");
 
 //activates debug statements for troubleshooting
@@ -36,5 +38,7 @@ module.exports = {
   Match: match,
   Participant: participant,
   Mastery: mastery,
+  Frame: frame,
+  Event: event,
   dropDB,
 };

@@ -1,7 +1,6 @@
 const TeemoJS = require("teemojs");
 let api = TeemoJS(process.env.RGAPI);
 const ErrorHelper = require("./error-helper");
-const fs = require("fs");
 
 // using a package the Riot-API is called
 //https://github.com/MingweiSamuel/TeemoJS

@@ -1,18 +1,22 @@
 // apiService uses a package to call the official riot api
 const apiService = require("../_helpers/api.service");
 const ErrorHelper = require("../_helpers/error-helper");
-const fs = require("fs");
 //instantiating the database: look at the database file for more info
 const db = require("../_helpers/db");
 // loads the Models
-const { Match, Participant, Summoner } = db;
+const { Match, Participant, Summoner, Event, Frame } = db;
+
+//Make Promise based response
+// no Batchoperations for different games
+//API requests in right before the data is needed
+//save participants, events, frames and match simultaneously
 
 async function saveParticipants(
   participantIdentities,
   participants,
   matchId,
 ) {
-  participantsToBeSaved = [];
+  let participantsToBeSaved = [];
   for (
     let outerIndex = 0;
     outerIndex < participantIdentities.length;
@@ -32,6 +36,8 @@ async function saveParticipants(
         });
         if (!checkParticipant) {
           let participantToBeSaved = new Participant();
+          participantToBeSaved.duplicateCheck =
+            identity.player.summonerId + "|" + matchId;
           participantToBeSaved.summonerId =
             identity.player.summonerId;
           participantToBeSaved.matchId = matchId;
@@ -238,24 +244,143 @@ async function saveParticipants(
             participant.timeline.damageTakenPerMinDeltas;
           participantToBeSaved.damageTakenDiffPerMinDeltas =
             participant.timeline.damageTakenDiffPerMinDeltas;
-
+          //console.log(participantToBeSaved);
           participantsToBeSaved.push(participantToBeSaved);
         } else {
-          console.log("Participant-Object already exists!");
+          //console.log("Participant-Object already exists!");
         }
       }
     }
   }
-  /* participantIdentities.forEach((identity) => {
-    participants.forEach((participant) => {
-      
-    });
-  }); */
-  Participant.insertMany(participantsToBeSaved);
+  try {
+    Participant.insertMany(participantsToBeSaved, { ordered: false });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-async function saveMatches(matchList) {
-  matchesToBeSaved = [];
+async function saveTimelineData(participantIdentities, matchId) {
+  const timeline = await apiService.matchtimeline(matchId);
+  let participants = {};
+  participantIdentities.forEach((identity) => {
+    participants[identity.participantId] = identity.player.summonerId;
+  });
+  let frames = [];
+  let events = [];
+  timeline.frames.forEach((dataFrame) => {
+    const values = Object.values(dataFrame.participantFrames);
+    values.forEach((frame) => {
+      frame.participantId = participants[frame.participantId];
+      frame.matchId = matchId;
+      frame.timestamp = dataFrame.timestamp;
+      const frameToBeSaved = new Frame(frame);
+      frames.push(frameToBeSaved);
+    });
+
+    dataFrame.events.forEach((event) => {
+      event.matchId = matchId;
+      if ("participantId" in event) {
+        event.participantId = participants[event.participantId];
+      }
+      if ("creatorId" in event) {
+        event.creatorId = participants[event.creatorId];
+      }
+      if ("killerId" in event) {
+        event.killerId = participants[event.killerId];
+      }
+      if ("victimId" in event) {
+        event.victimId = participants[event.victimId];
+      }
+      if ("assistingParticipantIds" in event) {
+        for (
+          let index = 0;
+          index < event.assistingParticipantIds.length;
+          index++
+        ) {
+          event.assistingParticipantIds[index] =
+            participants[event.assistingParticipantIds[index]];
+        }
+      }
+      const eventToBeSaved = new Event(event);
+      events.push(eventToBeSaved);
+    });
+  });
+  try {
+    Frame.insertMany(frames, { ordered: false });
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    Event.insertMany(events, { ordered: false });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function saveMatch(match) {
+  saveTimelineData(match.participantIdentities, match.gameId);
+  let matchToBeSaved = new Match();
+  matchToBeSaved.matchId = match.gameId;
+  matchToBeSaved.serverId = match.platformId;
+  matchToBeSaved.type = match.gameType;
+  matchToBeSaved.mode = match.gameMode;
+  matchToBeSaved.mapId = match.mapId;
+  matchToBeSaved.duration = match.gameDuration;
+  matchToBeSaved.matchDate = new Date(match.gameCreation);
+  // patch
+  let temporaryPatch = match.gameVersion.split(".");
+  matchToBeSaved.patch = temporaryPatch[0] + "." + temporaryPatch[1];
+
+  // participants
+  match.participantIdentities.forEach((identity) => {
+    matchToBeSaved.participants.push(identity.player.summonerId);
+  });
+  saveParticipants(
+    match.participantIdentities,
+    match.participants,
+    match.gameId,
+  );
+  //teams
+  match.teams.forEach((temporaryTeam) => {
+    let temporaryWin;
+    if (temporaryTeam.win === "Win") {
+      temporaryWin = true;
+    } else {
+      temporaryWin = false;
+    }
+    let teamToBeSaved = {
+      teamId: temporaryTeam.teamId,
+      win: temporaryWin,
+      firstBlood: temporaryTeam.firstBlood,
+      firstTower: temporaryTeam.firstTower,
+      firstInhibitor: temporaryTeam.firstInhibitor,
+      firstBaron: temporaryTeam.firstBaron,
+      firstDragon: temporaryTeam.firstDragon,
+      firstRiftHerald: temporaryTeam.firstRiftHerald,
+      towerKills: temporaryTeam.towerKills,
+      inhibitorKills: temporaryTeam.inhibitorKills,
+      baronKills: temporaryTeam.baronKills,
+      dragonKills: temporaryTeam.dragonKills,
+      vilemawKills: temporaryTeam.vilemawKills,
+      riftHeraldKills: temporaryTeam.riftHeraldKills,
+      bans: [],
+    };
+
+    temporaryTeam.bans.forEach((bansToBeSaved) => {
+      teamToBeSaved.bans.push(bansToBeSaved);
+    });
+    if (temporaryTeam.teamId === 100) {
+      matchToBeSaved.teams.blue = teamToBeSaved;
+    } else {
+      matchToBeSaved.teams.red = teamToBeSaved;
+    }
+  });
+  console.log(matchToBeSaved);
+  return matchToBeSaved;
+}
+
+async function saveBatchMatches(matchList) {
+  let matchesToBeSaved = [];
   var getMatches = matchList.map((tempor) => {
     return apiService.match(tempor.gameId).catch((err) => {
       console.log(err);
@@ -264,114 +389,45 @@ async function saveMatches(matchList) {
   var matches = await Promise.all(getMatches);
 
   matches.forEach((temporaryMatch) => {
-    let matchToBeSaved = new Match();
-    matchToBeSaved.matchId = temporaryMatch.gameId;
-    matchToBeSaved.serverId = temporaryMatch.platformId;
-    matchToBeSaved.type = temporaryMatch.gameType;
-    matchToBeSaved.mode = temporaryMatch.gameMode;
-    matchToBeSaved.mapId = temporaryMatch.mapId;
-    matchToBeSaved.duration = temporaryMatch.gameDuration;
-    matchToBeSaved.matchDate = new Date(temporaryMatch.gameCreation);
-    // patch
-    let temporaryPatch = temporaryMatch.gameVersion.split(".");
-    matchToBeSaved.patch =
-      temporaryPatch[0] + "." + temporaryPatch[1];
-
-    // participants
-    temporaryMatch.participantIdentities.forEach((identity) => {
-      matchToBeSaved.participants.push(identity.player.summonerId);
-    });
-    saveParticipants(
-      temporaryMatch.participantIdentities,
-      temporaryMatch.participants,
-      temporaryMatch.gameId,
-    );
-    //teams
-    temporaryMatch.teams.forEach((temporaryTeam) => {
-      let temporaryWin;
-      if (temporaryTeam.win === "Win") {
-        temporaryWin = true;
-      } else {
-        temporaryWin = false;
-      }
-      let teamToBeSaved = {
-        teamId: temporaryTeam.teamId,
-        win: temporaryWin,
-        firstBlood: temporaryTeam.firstBlood,
-        firstTower: temporaryTeam.firstTower,
-        firstInhibitor: temporaryTeam.firstInhibitor,
-        firstBaron: temporaryTeam.firstBaron,
-        firstDragon: temporaryTeam.firstDragon,
-        firstRiftHerald: temporaryTeam.firstRiftHerald,
-        towerKills: temporaryTeam.towerKills,
-        inhibitorKills: temporaryTeam.inhibitorKills,
-        baronKills: temporaryTeam.baronKills,
-        dragonKills: temporaryTeam.dragonKills,
-        vilemawKills: temporaryTeam.vilemawKills,
-        riftHeraldKills: temporaryTeam.riftHeraldKills,
-        bans: [],
-      };
-
-      temporaryTeam.bans.forEach((bansToBeSaved) => {
-        teamToBeSaved.bans.push(bansToBeSaved);
-      });
-      matchToBeSaved.teams.push(teamToBeSaved);
-    });
-    console.log(matchToBeSaved);
-    matchesToBeSaved.push(matchToBeSaved);
+    matchesToBeSaved.push(saveMatch(temporaryMatch));
   });
-  Match.insertMany(matchesToBeSaved);
+  console.log(matchesToBeSaved);
+  var matchess = await Promise.all(matchesToBeSaved);
+  try {
+    Match.insertMany(matchess, { ordered: false });
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 async function allMatches(summonerId) {
-  const match = await Match.findOne({
-    participants: summonerId,
-  }).sort({ matchDate: -1 });
-
-  var summoner = await Summoner.find({ summonerId: summonerId });
-  summoner = summoner[0];
+  var summoner = await Summoner.findOne({ summonerId: summonerId });
   const apiMatchlist = await apiService
     .matchlist(summoner.accountId)
     .catch((err) => {
       throw err;
     });
-  if (match) {
-    latestMatch = new Date(match.matchDate);
-    var newMatches = [];
-    apiMatchlist.forEach((ele) => {
-      var matchDate = new Date(ele.timestamp);
-      if (matchDate > latestMatch) {
-        newMatches.push(ele);
-      }
+
+  var newMatches = [];
+  for (let index = 0; index < apiMatchlist.length; index++) {
+    let match = await Match.findOne({
+      matchId: apiMatchlist[index].matchId,
     });
-    if (!newMatches.length) {
-      return "No new Matches";
+    if (match === null) {
+      newMatches.push(apiMatchlist[index]);
     }
-
-    for (
-      let index = 0;
-      index < newMatches.length;
-      index = index + 10
-    ) {
-      let temp = [];
-      temp = newMatches.slice(index, index + 10);
-      saveMatches(temp);
-    }
-
-    return "Processing " + newMatches.length + " Matche(s).";
-  } else {
-    for (
-      let index = 0;
-      index < apiMatchlist.length;
-      index = index + 10
-    ) {
-      let temp = [];
-      temp = apiMatchlist.slice(index, index + 10);
-      saveMatches(temp);
-    }
-
-    return "Processing " + apiMatchlist.length + " Matche(s).";
   }
+
+  if (!newMatches.length) {
+    return "No new Matches";
+  }
+
+  for (let index = 0; index < newMatches.length; index = index + 10) {
+    let temp = [];
+    temp = newMatches.slice(index, index + 10);
+    saveBatchMatches(temp);
+  }
+  return "Processing " + newMatches.length + " Matche(s).";
 }
 
 module.exports = {

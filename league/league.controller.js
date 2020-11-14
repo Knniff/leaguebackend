@@ -7,6 +7,37 @@ const authorize = require("../_helpers/authorize");
 const ErrorHelper = require("../_helpers/error-helper");
 
 const router = express.Router();
+// BASIC
+//get Summoner by Name and return
+
+//add or update Summoner and Ranked Stats by SummonerID
+
+//add or update Mastery, Matches and Timelines and calculate Stats marked with "*" by SummonerID
+
+//MATCH STATS
+//EVENT AND FRAMES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//get Matchdata with inbuilt Pagination by SummonerID
+
+//get Match, Participants and Timeline by MatchID
+
+//get Matchdata(alltime data or averages over the last 10, 50 or all games)(by different queue) by SummonerID*
+
+//get Participant(alltime data or averages over the last 10, 50 or all games)(by different queue) Stats by SummonerID*
+
+//get Roledata(alltime data or averages over the last 10, 50 or all games)(by different queue) by SummonerID*
+
+//CHAMPION STATS
+//get Participant(alltime data or averages over the last 10, 50 or all games)(by different queue) Stats for a specific Champion by SummonerID*
+
+//get Mastery(alltime data) Stats for a specific Champion by SummonerID*
+
+//for queue distinction
+//const list = require( "queue.json" );
+
+//LEAGUE
+//get Ranked Stats and overview of current League
+
+//get current Challenger League
 
 //find a Summoner by Id. then either update his data and mastery or add
 function summonerById(req, res, next) {
@@ -15,15 +46,12 @@ function summonerById(req, res, next) {
     .then((data) => res.json(data))
     .catch((err) => next(err));
 }
-
-//find a summoner by name and return
 function summonerByName(req, res, next) {
   apiService
     .summonerByName(req.params.name)
     .then((data) => res.json(data))
     .catch((err) => next(err));
 }
-
 //Mastery
 //get all mastery with built in pagination
 function mastery(req, res, next) {
